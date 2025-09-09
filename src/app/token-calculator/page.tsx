@@ -46,7 +46,7 @@ export default function TokenCalculatorPage() {
   const calculatedInvoices = Math.floor(tokens / 10);
   const effectiveCostPerInvoice = amount / calculatedInvoices;
 
-  // Sync invoices needed with amount
+  // Sync invoices needed with amount (only when invoices input changes)
   useEffect(() => {
     const newAmount = Math.max(MIN_AMOUNT, Math.min(MAX_AMOUNT, invoicesNeeded * 0.1));
     if (Math.abs(newAmount - amount) > 0.01) {
@@ -54,13 +54,13 @@ export default function TokenCalculatorPage() {
     }
   }, [invoicesNeeded]);
 
-  // Sync amount with invoices needed
+  // Sync amount with invoices needed (only when amount changes)
   useEffect(() => {
     const newInvoices = Math.floor(tokens / 10);
-    if (newInvoices !== invoicesNeeded) {
+    if (newInvoices !== invoicesNeeded && newInvoices > 0) {
       setInvoicesNeeded(newInvoices);
     }
-  }, [amount, tokens, invoicesNeeded]);
+  }, [amount]);
 
   const handleAmountChange = (value: string) => {
     const numValue = parseFloat(value) || 0;
