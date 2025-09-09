@@ -551,12 +551,14 @@ const sendEmail = async () => {
         throw new Error("Could not save invoice before sending.");
       }
 
-      // 2. Спрашиваем email
-      const recipientEmail = prompt("Please enter the recipient's email address:", client.email);
-      if (!recipientEmail) {
+      // 2. Проверяем email клиента
+      if (!client.email) {
+        setBanner({ type: 'error', msg: 'Please enter client email address first.' });
         setBusy(null);
         return;
       }
+      
+      const recipientEmail = client.email;
 
       // 3. Отправляем на наш API
       setBanner({ type: 'success', msg: 'Sending email...' });
@@ -752,7 +754,6 @@ const sendEmail = async () => {
               <Input label="Address line" value={client.address} onChange={(e) => setClient((c) => ({ ...c, address: e.target.value }))} />
               <Input label="City" value={client.city} onChange={(e) => setClient((c) => ({ ...c, city: e.target.value }))} />
               <Input label="Country" value={client.country} onChange={(e) => setClient((c) => ({ ...c, country: e.target.value }))} />
-              <div className="hidden sm:block" />
             </div>
             <div className="mt-3">
               <div className="text-xs text-slate-600 font-medium">Bank details (Client)</div>
