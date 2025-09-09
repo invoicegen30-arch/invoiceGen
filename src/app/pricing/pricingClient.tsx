@@ -242,17 +242,17 @@ export default function PricingClient() {
 }
 
 function CustomPlanCard({ currency, onPurchase }: { currency: Currency; onPurchase: (amount: number, currency: Currency) => void; }) {
-  const [price, setPrice] = useState<number>(5);
+  const [priceInput, setPriceInput] = useState<string>('5');
   const TOKENS_PER_UNIT = 100;
   const TOKENS_PER_INVOICE = 10;
   const min = 5;
-  const tokens = Math.max(0, Math.round(price * TOKENS_PER_UNIT));
+  const numericPrice = parseFloat(priceInput || '0');
+  const validNumber = Number.isFinite(numericPrice);
+  const tokens = Math.max(0, Math.round((validNumber ? numericPrice : 0) * TOKENS_PER_UNIT));
   const invoices = Math.round(tokens / TOKENS_PER_INVOICE);
 
   const onChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    const v = parseFloat(e.target.value || '0');
-    if (isNaN(v)) return;
-    setPrice(Math.max(min, v));
+    setPriceInput(e.target.value);
   };
 
   return (
@@ -264,11 +264,14 @@ function CustomPlanCard({ currency, onPurchase }: { currency: Currency; onPurcha
       </div>
       <div className="mt-3 flex items-center gap-2">
         <span className="text-3xl font-bold">{currency === 'GBP' ? '£' : '€'}</span>
-        <input type="number" min={min} step={1} value={price}
+        <input type="number" step="any" value={priceInput}
           onChange={onChange}
           className="w-24 text-3xl font-bold bg-transparent border-b border-black/10 focus:outline-none focus:ring-0" aria-label="Custom price" />
         <span className="text-base font-normal text-slate-500">/one-time</span>
       </div>
+      {(!validNumber || numericPrice < min) && (
+        <div className="mt-1 text-[11px] text-red-600">Minimum amount is {currency === 'GBP' ? '£' : '€'}5.00</div>
+      )}
       <div className="mt-1 text-xs text-slate-600">= {tokens} tokens (~{invoices} invoices)</div>
       <ul className="mt-4 space-y-2 text-sm text-slate-700 list-disc pl-5">
         <li>Top up your account</li>
@@ -276,7 +279,7 @@ function CustomPlanCard({ currency, onPurchase }: { currency: Currency; onPurcha
         <li>Min {currency === 'GBP' ? '£5' : '€5'}</li>
       </ul>
       <div className="mt-6">
-        <Button className="w-full" size="lg" onClick={() => onPurchase(price, currency)}>
+        <Button className="w-full" size="lg" onClick={() => onPurchase(numericPrice, currency)} disabled={!validNumber || numericPrice < min}>
           Buy tokens
         </Button>
       </div>
