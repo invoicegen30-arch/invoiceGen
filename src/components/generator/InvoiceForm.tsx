@@ -285,14 +285,14 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
     }
     setBusy('download');
     setBanner(null);
-    let invoiceId: string | null = null;
     try {
-      // Create a draft (no charge)
       // Sync seller company details first
       try {
         await fetch('/api/company', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: sender.company, vat: sender.vat, address1: sender.address, city: sender.city, country: sender.country, iban: sender.iban, logoUrl: logo || undefined, bankName: sender.bankName, bic: sender.bic }) });
       } catch {}
-      const draftRes = await fetch('/api/drafts', {
+      
+      // Create Ready invoice directly (charges 10 tokens)
+      const res = await fetch('/api/invoices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -302,29 +302,45 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
           tax: Math.round(taxTotal),
           total: Math.round(total),
           due: invoiceMeta.due,
-          clientMeta: { vat: client.vat, address: client.address, city: client.city, country: client.country, email: client.email, iban: client.iban, bankName: client.bankName, bic: client.bic },
-          items: items.map((it) => ({ description: it.desc, quantity: it.qty, rate: it.rate, tax: it.tax })),
+          clientMeta: {
+            vat: client.vat,
+            address: client.address,
+            city: client.city,
+            country: client.country,
+            email: client.email,
+            iban: client.iban,
+            bankName: client.bankName,
+            bic: client.bic,
+          },
+          items: items.map((it) => ({
+            description: it.desc,
+            quantity: it.qty,
+            rate: it.rate,
+            tax: it.tax,
+          })),
         }),
       });
-      if (!draftRes.ok) throw new Error((await draftRes.json().catch(() => ({ error: 'Failed' }))).error || 'Failed to create draft');
-      const { invoice } = await draftRes.json();
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to create invoice');
+      }
+      
+      const { invoice, tokenBalance } = await res.json();
+      if (!invoice || !invoice.id) {
+        throw new Error("Could not create invoice for download.");
+      }
+      
+      // Update token balance
+      if (typeof tokenBalance === 'number') {
+        setTokenBalance(tokenBalance);
+        try { bcRef.current?.postMessage({ type: 'tokens-updated', tokenBalance }); } catch {}
+      }
+      
+      // Update invoice meta
       try {
         setInvoiceMeta((prev) => ({ ...prev, number: String(invoice.number || prev.number), date: new Date(invoice.date).toISOString().slice(0, 10) }));
       } catch {}
-      invoiceId = invoice.id as string;
-
-      // Mark Ready (charges 100 tokens)
-      const readyRes = await fetch(`/api/invoices/${invoiceId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'Ready', subtotal: Math.round(subtotal), tax: Math.round(taxTotal), total: Math.round(total) }),
-      });
-      if (!readyRes.ok) throw new Error((await readyRes.json().catch(() => ({ error: 'Failed' }))).error || 'Failed to mark Ready');
-      const j = await readyRes.json();
-      if (typeof j.tokenBalance === 'number') {
-        setTokenBalance(j.tokenBalance);
-        try { bcRef.current?.postMessage({ type: 'tokens-updated', tokenBalance: j.tokenBalance }); } catch {}
-      }
 
       // Generate downloadable PDF from the hidden print area
       const el = document.getElementById('print-area');
@@ -410,63 +426,6 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
     }
   };
 
-  const saveAndShare = async () => {
-    if (!signedIn) return;
-    if (tokenBalance !== null && tokenBalance < 10) {
-      setBanner({ type: 'error', msg: 'Not enough tokens (10 required).' });
-      return;
-    }
-    setBusy('share');
-    setBanner(null);
-    let invoiceId: string | null = null;
-    try {
-      // Sync seller company details
-      try { await fetch('/api/company', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: sender.company, vat: sender.vat, address1: sender.address, city: sender.city, country: sender.country, iban: sender.iban, logoUrl: logo || undefined, bankName: sender.bankName, bic: sender.bic }) }); } catch {}
-      const res = await fetch('/api/drafts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          currency,
-          client: client.name,
-          subtotal: Math.round(subtotal),
-          tax: Math.round(taxTotal),
-          total: Math.round(total),
-          due: invoiceMeta.due,
-          clientMeta: { vat: client.vat, address: client.address, city: client.city, country: client.country, email: client.email, iban: client.iban, bankName: client.bankName, bic: client.bic },
-          items: items.map((it) => ({ description: it.desc, quantity: it.qty, rate: it.rate, tax: it.tax })),
-        }),
-      });
-      if (!res.ok) throw new Error((await res.json().catch(() => ({ error: 'Failed' }))).error || 'Failed to save draft');
-      const { invoice } = await res.json();
-      try {
-        setInvoiceMeta((prev) => ({ ...prev, number: String(invoice.number || prev.number), date: new Date(invoice.date).toISOString().slice(0, 10) }));
-      } catch {}
-      invoiceId = invoice.id as string;
-
-      const readyRes = await fetch(`/api/invoices/${invoiceId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'Ready', subtotal: Math.round(subtotal), tax: Math.round(taxTotal), total: Math.round(total) }),
-      });
-      if (!readyRes.ok) throw new Error((await readyRes.json().catch(() => ({ error: 'Failed' }))).error || 'Failed to mark Ready');
-      const j = await readyRes.json();
-      if (typeof j.tokenBalance === 'number') {
-        setTokenBalance(j.tokenBalance);
-        try { bcRef.current?.postMessage({ type: 'tokens-updated', tokenBalance: j.tokenBalance }); } catch {}
-      }
-
-      const url = `${window.location.origin}/s/${invoiceId}`;
-      await navigator.clipboard.writeText(url);
-      setBanner({ type: 'success', msg: 'Share link copied to clipboard.' });
-    } catch (e: any) {
-      if (invoiceId) {
-        try { await fetch(`/api/invoices/${invoiceId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'Error' }) }); } catch {}
-      }
-      setBanner({ type: 'error', msg: e.message || 'Failed to save or copy.' });
-    } finally {
-      setBusy(null);
-    }
-  };
 
 const saveInvoice = async (isDraft: boolean) => {
     try {
@@ -548,11 +507,58 @@ const sendEmail = async () => {
     setBusy('email');
     setBanner(null);
     try {
-      // 1. Сохраняем инвойс как "Ready" (isDraft = false)
-      const savedInvoice = await saveInvoice(false);
-      if (!savedInvoice || !savedInvoice.id) {
-        throw new Error("Could not save invoice before sending.");
+      // 1. Создаем Ready инвойс напрямую через /api/invoices (списывает токены)
+      const res = await fetch('/api/invoices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currency,
+          client: client.name,
+          subtotal: Math.round(subtotal),
+          tax: Math.round(taxTotal),
+          total: Math.round(total),
+          due: invoiceMeta.due,
+          clientMeta: {
+            vat: client.vat,
+            address: client.address,
+            city: client.city,
+            country: client.country,
+            email: client.email,
+            iban: client.iban,
+            bankName: client.bankName,
+            bic: client.bic,
+          },
+          items: items.map((it) => ({
+            description: it.desc,
+            quantity: it.qty,
+            rate: it.rate,
+            tax: it.tax,
+          })),
+        }),
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to create invoice');
       }
+      
+      const { invoice, tokenBalance } = await res.json();
+      if (!invoice || !invoice.id) {
+        throw new Error("Could not create invoice for sending.");
+      }
+      
+      // Update token balance
+      if (typeof tokenBalance === 'number') {
+        setTokenBalance(tokenBalance);
+        try { bcRef.current?.postMessage({ type: 'tokens-updated', tokenBalance }); } catch {}
+      }
+      
+      // Update invoice meta
+      try {
+        setInvoiceMeta((prev) => ({ ...prev, number: String(invoice.number || prev.number), date: new Date(invoice.date).toISOString().slice(0, 10) }));
+      } catch {}
+      
+      const savedInvoice = invoice;
 
       // 2. Проверяем email клиента
       if (!client.email) {
@@ -625,9 +631,6 @@ const sendEmail = async () => {
           </Button>
           <Button onClick={sendEmail} disabled={gated || busy !== null} title={gated ? 'Available after sign-up' : 'Send via email'} size="sm" className={gated ? 'bg-slate-300' : ''}>
             {busy === 'email' ? 'Processing:' : 'Send email'}
-          </Button>
-          <Button onClick={saveAndShare} disabled={gated || busy !== null} title={gated ? 'Available after sign-up' : 'Save & share link'} size="sm" className={gated ? 'bg-slate-300' : ''}>
-            {busy === 'share' ? 'Saving:' : 'Save & share link'}
           </Button>
         </div>
       </div>

@@ -67,6 +67,7 @@ export async function POST(req: Request) {
         type: 'Invoice',
         delta: -10,
         balanceAfter: newBalance,
+        invoiceNumber: number,
       },
     });
 

@@ -9,7 +9,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 type Currency = 'GBP' | 'EUR';
 type InvoiceStatus = 'Draft' | 'Ready' | 'Error' | 'Sent' | 'Paid' | 'Overdue';
 type Invoice = { id: string; number: string; date: string; client: string; currency: Currency; subtotal: number; tax: number; total: number; status: InvoiceStatus };
-type LedgerRow = { id: string; ts: string; type: 'Top-up' | 'Invoice' | 'Adjust' | 'STRIPE_PURCHASE'; delta: number; balanceAfter: number; currency?: Currency; amount?: number; receiptUrl?: string };
+type LedgerRow = { id: string; ts: string; type: 'Top-up' | 'Invoice' | 'Adjust' | 'STRIPE_PURCHASE'; delta: number; balanceAfter: number; currency?: Currency; amount?: number; receiptUrl?: string; invoiceNumber?: string };
 type Company = { name: string; vat?: string; reg?: string; address1?: string; city?: string; country?: string; iban?: string; bankName?: string; bic?: string };
 type Me = { id: string; name: string | null; email: string | null; tokenBalance: number; currency: Currency; company: Company | null };
 
@@ -280,7 +280,6 @@ export default function DashboardClient() {
                                   onClose={()=>{ setViewId(null); setViewInv(null); }}
                                   onRefresh={async(id)=>{ const iv = await fetchInvoice(id); if(iv) setViewInv(iv); }}
                                   onDownload={()=>ensureReadyAndDownload(viewInv.id)}
-                                  onShare={async()=>{ const r = await markReadyIfDraft(viewInv.id); if(!r.ok){ alert(r.err||'Failed'); return;} const url = `${window.location.origin}/s/${viewInv.id}`; await navigator.clipboard.writeText(url); alert('Share link copied'); }}
                                   onSendEmail={async()=>{ const r = await markReadyIfDraft(viewInv.id); if(r.ok){ alert('Email queued'); } else { alert(r.err||'Failed'); }}}
                                   onSave={async(next)=>{
                                     const res = await fetch(`/api/invoices/${viewInv.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(next) });
@@ -308,6 +307,7 @@ export default function DashboardClient() {
                     <tr>
                       <th className="text-left px-3 py-2">Date</th>
                       <th className="text-left px-3 py-2">Type</th>
+                      <th className="text-left px-3 py-2">Number</th>
                       <th className="text-right px-3 py-2">Delta</th>
                       <th className="text-right px-3 py-2">Balance</th>
                       <th className="text-right px-3 py-2">Receipt</th>
@@ -318,6 +318,7 @@ export default function DashboardClient() {
                       <tr key={row.id} className="border-t border-black/10">
                         <td className="px-3 py-2 whitespace-nowrap">{new Date(row.ts).toLocaleString()}</td>
                         <td className="px-3 py-2">{row.type}</td>
+                        <td className="px-3 py-2">{row.invoiceNumber || '-'}</td>
                         <td className={`px-3 py-2 text-right ${row.delta>0?'text-emerald-700':'text-slate-900'}`}>{row.delta>0? `+${int(row.delta)}` : `-${int(Math.abs(row.delta))}`} tokens</td>
                         <td className="px-3 py-2 text-right">{int(row.balanceAfter)}</td>
                         <td className="px-3 py-2 text-right">{row.type==='Top-up' || row.type === 'STRIPE_PURCHASE' ? <a className="underline text-sm" href={row.receiptUrl||'#'} target="_blank" rel="noopener noreferrer">Receipt</a> : '-'}</td>
@@ -387,7 +388,6 @@ export default function DashboardClient() {
               onClose={() => { setViewId(null); setViewInv(null); }}
               onRefresh={async(id)=>{ const inv = await fetchInvoice(id); if(inv) setViewInv(inv); }}
               onDownload={()=>ensureReadyAndDownload(viewInv.id)}
-              onShare={async()=>{ const r = await markReadyIfDraft(viewInv.id); if(!r.ok){ alert(r.err||'Failed'); return;} const url = `${window.location.origin}/s/${viewInv.id}`; await navigator.clipboard.writeText(url); alert('Share link copied'); }}
               onSendEmail={async () => {
                 const clientEmail = (viewInv.clientMeta?.email as string) || '';
                 
@@ -461,12 +461,11 @@ function TablePager({ total, pageSize = 20, onSlice }: { total: number; pageSize
 const InvoicePager = TablePager;
 const LedgerPager = TablePager;
 
-function ModalInvoiceView({ invoice, onClose, onDownload, onSendEmail, onShare, onRefresh, onSave }: {
+function ModalInvoiceView({ invoice, onClose, onDownload, onSendEmail, onRefresh, onSave }: {
   invoice: any;
   onClose: () => void;
   onDownload: () => void;
   onSendEmail: () => void;
-  onShare: () => void;
   onRefresh: (id: string) => Promise<void>;
   onSave: (next: { client?: string; subtotal?: number; tax?: number; total?: number }) => Promise<void>;
 }) {
@@ -549,7 +548,6 @@ function ModalInvoiceView({ invoice, onClose, onDownload, onSendEmail, onShare, 
             {invoice.status==='Draft' && (<button className="text-sm underline" onClick={()=>alert('Already saved as draft')}>Save draft</button>)}
             <button className="text-sm underline" onClick={onDownload}>Download PDF</button>
             <button className="text-sm underline" onClick={onSendEmail}>Send email</button>
-            <button className="text-sm underline" onClick={onShare}>Save & share link</button>
           </>
         ) : (
           <>

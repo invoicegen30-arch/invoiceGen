@@ -138,4 +138,5 @@ model LedgerEntry {
   currency     Currency?
   amount       Int?
   receiptUrl   String?
+  invoiceNumber String?  // Invoice number for Invoice type entries
 }
