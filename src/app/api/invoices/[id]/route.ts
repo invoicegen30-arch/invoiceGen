@@ -6,6 +6,51 @@ import { prisma } from '@/lib/prisma';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
+    const { id } = await params;
+    const userId = (session.user as any).id as string;
+
+    // Find the invoice with all related data
+    const invoice = await prisma.invoice.findFirst({
+      where: {
+        id,
+        userId,
+      },
+      include: { 
+        items: true,
+        user: { 
+          include: { company: true } 
+        }
+      },
+    });
+
+    if (!invoice) {
+      return NextResponse.json({ error: 'Invoice not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ 
+      invoice: { 
+        ...invoice, 
+        subtotal: Number(invoice.subtotal), 
+        tax: Number(invoice.tax), 
+        total: Number(invoice.total) 
+      } 
+    });
+  } catch (error) {
+    console.error('[INVOICE_GET_ERROR]', error);
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);

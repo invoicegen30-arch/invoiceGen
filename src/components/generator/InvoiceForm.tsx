@@ -183,6 +183,8 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
             city: company.city ?? prev.city,
             country: nextCountry ?? prev.country,
             iban: company.iban ?? prev.iban,
+            bankName: company.bankName ?? prev.bankName,
+            bic: company.bic ?? prev.bic,
           }));
           if (company.country && CURRENCY_BY_COUNTRY[company.country]) setCountry(company.country);
         }

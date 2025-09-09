@@ -28,6 +28,8 @@ export async function POST(req: Request) {
   const tax = toDec(body.tax ?? 20);
   const total = toDec(body.total ?? (Number(body.subtotal ?? 100) + Number(body.tax ?? 20)));
   const dueIso = typeof body.due === 'string' && body.due ? new Date(body.due) : null;
+  const items = Array.isArray(body.items) ? body.items as Array<{ description: string; quantity: number; rate: number; tax: number }> : [];
+  const clientMeta = body.clientMeta && typeof body.clientMeta === 'object' ? body.clientMeta : undefined;
 
   // Charge 10 tokens per created invoice
   return await prisma.$transaction(async (tx) => {
@@ -50,8 +52,11 @@ export async function POST(req: Request) {
         subtotal,
         tax,
         total,
-        status: 'Draft',
+        status: 'Ready',
+        clientMeta: clientMeta as any,
+        items: items.length ? { create: items.map(it => ({ description: it.description, quantity: Math.round(it.quantity||0), rate: toDec(it.rate||0), tax: Math.round(it.tax||0) })) } : undefined,
       },
+      include: { items: true },
     });
 
     const newBalance = user.tokenBalance - 10;
