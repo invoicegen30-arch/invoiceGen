@@ -531,8 +531,9 @@ const saveInvoice = async (isDraft: boolean) => {
         });
       }
       return invoice;
-    } catch (e) {
-      return null;
+    } catch (e: any) {
+      console.error('Save invoice error:', e);
+      throw new Error(e.message || 'Failed to save invoice');
     }
   };
 

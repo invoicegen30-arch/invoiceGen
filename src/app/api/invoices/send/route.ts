@@ -67,7 +67,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("[INVOICE_SEND_ERROR]", error);
     return NextResponse.json(
-      { message: "Internal Server Error" },
+      { message: error instanceof Error ? error.message : "Internal Server Error" },
       { status: 500 },
     );
   }
