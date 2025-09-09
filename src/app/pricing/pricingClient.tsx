@@ -52,7 +52,11 @@ function Price({ amount, currency, vatRate }: { amount: number; currency: Curren
 }
 
 export default function PricingClient() {
-  const [currency, setCurrency] = useState<Currency>('GBP');
+  const bcRef = useRef<BroadcastChannel | null>(null);
+  const [currency, setCurrency] = useState<Currency>(()=>{
+    if (typeof window === 'undefined') return 'GBP';
+    try { return (localStorage.getItem('currency') as Currency) || 'GBP'; } catch { return 'GBP'; }
+  });
   const [country, setCountry] = useState<string>('United Kingdom');
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const { status } = useSession();
@@ -64,6 +68,20 @@ export default function PricingClient() {
     const rates = (VAT_RATES as Record<string, number[]>)[code] || [0,20];
     return rates[rates.length-1] || 20;
   }, [country]);
+
+  useEffect(()=>{
+    try {
+      bcRef.current = new BroadcastChannel('app-events');
+      bcRef.current.onmessage = (ev: MessageEvent) => {
+        const data: any = (ev as any)?.data || {};
+        if (data.type === 'currency-updated' && (data.currency === 'GBP' || data.currency === 'EUR')) {
+          setCurrency(data.currency);
+          try { localStorage.setItem('currency', data.currency); } catch {}
+        }
+      };
+    } catch {}
+    return () => { try { bcRef.current?.close(); } catch {} };
+  }, []);
 
   const handlePurchase = async (planId: string | null, customAmount?: number) => {
     if (!signedIn) {

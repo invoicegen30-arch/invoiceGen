@@ -54,8 +54,8 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.6 }}
             >
-              <Button href="#demo" size="lg">
-                Try the demo
+              <Button href="#why-us" size="lg">
+                Why choose us
               </Button>
               <Button variant="outline" href="#pricing" size="lg">
                 Pricing & Comparison

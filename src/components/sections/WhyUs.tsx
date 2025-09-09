@@ -16,7 +16,7 @@ const ICONS_BY_ID: Record<string, (props: any) => JSX.Element> = {
 
 export default function WhyUs() {
   return (
-    <Section className="py-12">
+    <Section id="why-us" className="py-12">
       <motion.div 
         className="text-center mb-8"
         initial={{ opacity: 0, y: 20 }}

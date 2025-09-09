@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { THEME } from '@/lib/theme';
+import Segmented from '@/components/ui/Segmented';
 import { useSession, signOut } from 'next-auth/react';
 
 export default function Header() {
@@ -17,6 +18,10 @@ export default function Header() {
   const isGenerator = pathname === '/generator';
   const isPricing = pathname === '/pricing';
   const isDashboard = pathname === '/dashboard';
+  const [currency, setCurrency] = useState<'GBP' | 'EUR'>(() => {
+    if (typeof window === 'undefined') return 'GBP';
+    try { return (localStorage.getItem('currency') as 'GBP'|'EUR') || 'GBP'; } catch { return 'GBP'; }
+  });
 
   useEffect(() => {
     const t = (session?.user as any)?.tokenBalance;
@@ -31,10 +36,20 @@ export default function Header() {
         if (data.type === 'tokens-updated' && typeof data.tokenBalance === 'number') {
           setTokens(data.tokenBalance);
         }
+        if (data.type === 'currency-updated' && (data.currency === 'GBP' || data.currency === 'EUR')) {
+          setCurrency(data.currency);
+          try { localStorage.setItem('currency', data.currency); } catch {}
+        }
       };
     } catch {}
     return () => { try { bcRef.current?.close(); } catch {} };
   }, []);
+
+  const onCurrencyChange = (next: 'GBP'|'EUR') => {
+    setCurrency(next);
+    try { localStorage.setItem('currency', next); } catch {}
+    try { bcRef.current?.postMessage({ type: 'currency-updated', currency: next }); } catch {}
+  };
 
   return (
     <motion.header 
@@ -68,6 +83,13 @@ export default function Header() {
         </div>
         
         <div className="flex items-center gap-3">
+          <div className="hidden md:block">
+            <Segmented
+              options={[{ label: 'GBP', value: 'GBP' }, { label: 'EUR', value: 'EUR' }]}
+              value={currency}
+              onChange={(v)=>onCurrencyChange(v as 'GBP'|'EUR')}
+            />
+          </div>
           {!signedIn ? (
             <>
               <Link

@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Section from '@/components/layout/Section';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -9,6 +9,32 @@ import { PRICING_PLANS } from '@/lib/data';
 import { THEME } from '@/lib/theme';
 
 export default function Pricing() {
+  const bcRef = useRef<BroadcastChannel | null>(null);
+  const [currency, setCurrency] = useState<'GBP'|'EUR'>(()=>{
+    if (typeof window === 'undefined') return 'GBP';
+    try { return (localStorage.getItem('currency') as 'GBP'|'EUR') || 'GBP'; } catch { return 'GBP'; }
+  });
+
+  useEffect(()=>{
+    try {
+      bcRef.current = new BroadcastChannel('app-events');
+      bcRef.current.onmessage = (ev: MessageEvent) => {
+        const data: any = (ev as any)?.data || {};
+        if (data.type === 'currency-updated' && (data.currency === 'GBP' || data.currency === 'EUR')) {
+          setCurrency(data.currency);
+          try { localStorage.setItem('currency', data.currency); } catch {}
+        }
+      };
+    } catch {}
+    return () => { try { bcRef.current?.close(); } catch {} };
+  }, []);
+
+  const formatPrice = (priceText: string) => {
+    const match = priceText.match(/([0-9]+(?:\.[0-9]+)?)/);
+    const amount = match ? match[1] : '0';
+    return `${currency} ${amount}`;
+  };
+
   return (
     <Section id="pricing" className="py-14">
       <motion.div
@@ -48,11 +74,11 @@ export default function Pricing() {
                   )}
                 </div>
                 <div className="mt-3 text-3xl font-bold">
-                  {plan.price}
+                  {formatPrice(plan.price)}
                   <span className="text-base font-normal text-slate-500">/one-time</span>
                 </div>
                 {/* Tokens line (GBP baseline) */}
-                <TokensLine planName={plan.name} priceText={plan.price} />
+                <TokensLine planName={plan.name} priceText={formatPrice(plan.price)} />
                 <ul className="mt-4 space-y-2 text-sm text-slate-700">
                   {plan.points.map((point, pointIndex) => (
                     <motion.li
@@ -83,7 +109,7 @@ export default function Pricing() {
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
         >
-          <CustomHomeCard />
+          <CustomHomeCard currency={currency} />
         </motion.div>
       </div>
       <p className="mt-4 text-xs text-slate-500 text-center">Prices exclude VAT. Tokens deposit to your account after purchase (signed-in users only).</p>
@@ -108,7 +134,7 @@ function TokensLine({ planName, priceText }: { planName: string; priceText: stri
   );
 }
 
-function CustomHomeCard() {
+function CustomHomeCard({ currency }: { currency: 'GBP'|'EUR' }) {
   const [price, setPrice] = useState<number>(5);
   const min = 5;
   const TOKENS_PER_UNIT = 100;
@@ -130,7 +156,7 @@ function CustomHomeCard() {
           <span className="text-xs rounded-full px-2 py-1 bg-slate-100 border border-black/10 text-slate-700">EARLY / SUPPORTER</span>
         </div>
         <div className="mt-3 flex items-center gap-2">
-          <span className="text-sm font-medium text-slate-600">GBP</span>
+          <span className="text-sm font-medium text-slate-600">{currency}</span>
           <input
             type="number"
             min={min}
@@ -146,7 +172,7 @@ function CustomHomeCard() {
         <ul className="mt-4 space-y-2 text-sm text-slate-700">
           <li>Top up your account</li>
           <li>No subscription — pay what you need</li>
-          <li>Min GBP 5</li>
+          <li>Min {currency} 5</li>
         </ul>
       </div>
       <div className="mt-6">
