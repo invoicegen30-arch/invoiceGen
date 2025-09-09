@@ -17,11 +17,14 @@ export default function Header() {
   const isHome = pathname === '/';
   const isGenerator = pathname === '/generator';
   const isPricing = pathname === '/pricing';
+  const isTokenCalc = pathname === '/token-calculator';
+  const isAbout = pathname === '/about';
   const isDashboard = pathname === '/dashboard';
   const [currency, setCurrency] = useState<'GBP' | 'EUR'>(() => {
     if (typeof window === 'undefined') return 'GBP';
     try { return (localStorage.getItem('currency') as 'GBP'|'EUR') || 'GBP'; } catch { return 'GBP'; }
   });
+  const [helpOpen, setHelpOpen] = useState(false);
 
   useEffect(() => {
     const t = (session?.user as any)?.tokenBalance;
@@ -51,6 +54,12 @@ export default function Header() {
     try { bcRef.current?.postMessage({ type: 'currency-updated', currency: next }); } catch {}
   };
 
+  const closeHelp = () => setHelpOpen(false);
+  const toggleHelp = () => setHelpOpen((v)=>!v);
+  const onKeyDownHelp: React.KeyboardEventHandler<HTMLButtonElement> = (e) => {
+    if (e.key === 'Escape') setHelpOpen(false);
+  };
+
   return (
     <motion.header 
       className="sticky top-0 z-40 backdrop-blur bg-white/80 border-b border-black/10"
@@ -71,14 +80,34 @@ export default function Header() {
             </motion.span>
           </Link>
           
-          <nav className="hidden sm:flex items-center gap-2 text-sm">
-            <a href="/" className={`rounded-xl px-3 py-2 transition-colors ${isHome ? 'bg-black/5' : ''}`}>Home</a>
-            <a href="/generator" className={`rounded-xl px-3 py-2 transition-colors ${isGenerator ? 'bg-black/5' : ''}`}>Invoice Generator</a>
+          <nav className="hidden sm:flex items-center gap-2 text-sm relative">
+            <a href="/generator" className={`rounded-xl px-3 py-2 transition-colors ${isGenerator ? 'bg-black/5' : 'hover:bg-black/5'}`}>Invoice Generator</a>
             {signedIn && (
-              <a href="/dashboard" className={`rounded-xl px-3 py-2 transition-colors ${isDashboard ? 'bg-black/5' : ''}`}>Dashboard</a>
+              <a href="/dashboard" className={`rounded-xl px-3 py-2 transition-colors ${isDashboard ? 'bg-black/5' : 'hover:bg-black/5'}`}>Dashboard</a>
             )}
-            <a href="/pricing" className={`rounded-xl px-3 py-2 hidden md:inline-block transition-colors ${isPricing ? 'bg-black/5' : 'hover:bg-black/5'}`}>Top-Up</a>
-            <a href="/contact" className="rounded-xl px-3 py-2 hidden md:inline-block hover:bg-black/5 transition-colors">Contact</a>
+            <a href="/pricing" className={`rounded-xl px-3 py-2 transition-colors ${isPricing ? 'bg-black/5' : 'hover:bg-black/5'}`}>Top-Up</a>
+            <a href="/token-calculator" className={`rounded-xl px-3 py-2 transition-colors ${isTokenCalc ? 'bg-black/5' : 'hover:bg-black/5'}`}>Token Calculator</a>
+            <div className="relative">
+              <button
+                className={`rounded-xl px-3 py-2 transition-colors flex items-center gap-2 ${helpOpen ? 'bg-black/5' : 'hover:bg-black/5'}`}
+                aria-haspopup="menu"
+                aria-expanded={helpOpen}
+                onClick={toggleHelp}
+                onKeyDown={onKeyDownHelp}
+              >
+                <span>Help</span>
+                <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" aria-label="Status ok" />
+              </button>
+              {helpOpen && (
+                <div className="absolute left-0 mt-2 w-56 rounded-xl border border-black/10 bg-white shadow-lg z-50" role="menu" onMouseLeave={closeHelp}>
+                  <a href="/help/faq" className="block px-3 py-2 text-sm hover:bg-slate-50" role="menuitem">FAQ</a>
+                  <a href="/help/getting-started" className="block px-3 py-2 text-sm hover:bg-slate-50" role="menuitem">Getting Started</a>
+                  <a href="/help/billing-tokens" className="block px-3 py-2 text-sm hover:bg-slate-50" role="menuitem">Billing & Tokens</a>
+                  <a href="/help/troubleshooting" className="block px-3 py-2 text-sm hover:bg-slate-50" role="menuitem">Troubleshooting</a>
+                </div>
+              )}
+            </div>
+            <a href="/about" className={`rounded-xl px-3 py-2 transition-colors ${isAbout ? 'bg-black/5' : 'hover:bg-black/5'}`}>About</a>
           </nav>
         </div>
         
