@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import Section from '@/components/layout/Section';
