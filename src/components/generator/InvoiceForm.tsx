@@ -1,15 +1,15 @@
 'use client';
 
+import InvoiceA4 from '@/components/pdf/InvoiceA4';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
+import LogoUploader from '@/components/ui/LogoUploader';
+import Textarea from '@/components/ui/Textarea';
+import { CC, CURRENCY_BY_COUNTRY, VAT_RATES } from '@/lib/constants';
+import { Item, TaxMode } from '@/types/invoice';
 import { motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
-import { Item, TaxMode } from '@/types/invoice';
-import { CURRENCY_BY_COUNTRY, CC, VAT_RATES } from '@/lib/constants';
-import Input from '@/components/ui/Input';
-import Textarea from '@/components/ui/Textarea';
-import Button from '@/components/ui/Button';
 import InvoicePaper from './InvoicePaper';
-import InvoiceA4 from '@/components/pdf/InvoiceA4';
-import LogoUploader from '@/components/ui/LogoUploader';
 
 interface InvoiceFormProps {
   signedIn: boolean;
@@ -17,6 +17,7 @@ interface InvoiceFormProps {
 
 export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
   const bcRef = useRef<BroadcastChannel | null>(null);
+  const printRef = useRef<HTMLDivElement>(null);
 
   // Region/country/currency/tax
   const [region, setRegion] = useState('UK');
@@ -57,6 +58,7 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
     iban: '',
     bankName: '',
     bic: '',
+    email: '',
   });
   const [invoiceMeta, setInvoiceMeta] = useState({
     number: 'INV-2025-000245',
@@ -380,8 +382,9 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
     setBusy('save');
     setBanner(null);
     try {
-      // Sync seller company details
-      try { await fetch('/api/company', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: sender.company, vat: sender.vat, address1: sender.address, city: sender.city, country: sender.country, iban: sender.iban, logoUrl: logo || undefined, bankName: sender.bankName, bic: sender.bic }) }); } catch {}
+      await fetch('/api/company', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: sender.company, vat: sender.vat, address1: sender.address, city: sender.city, country: sender.country, iban: sender.iban, logoUrl: logo || undefined, bankName: sender.bankName, bic: sender.bic }) });
+    } catch {}
+    try {
       const res = await fetch('/api/drafts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -398,8 +401,8 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
       });
       if (!res.ok) throw new Error((await res.json().catch(() => ({ error: 'Failed' }))).error || 'Failed to save draft');
       setBanner({ type: 'success', msg: 'Draft saved to Dashboard.' });
-    } catch (e: any) {
-      setBanner({ type: 'error', msg: e.message || 'Failed to save draft.' });
+    } catch (e) {
+      setBanner({ type: 'error', msg: (e as any).message || 'Failed to save draft.' });
     } finally {
       setBusy(null);
     }
@@ -463,16 +466,27 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
     }
   };
 
-  const sendEmail = async () => {
-    if (!signedIn) return;
-    if (tokenBalance !== null && tokenBalance < 10) {
-      setBanner({ type: 'error', msg: 'Not enough tokens (10 required).' });
-      return;
-    }
-    setBusy('email');
-    setBanner(null);
-    let invoiceId: string | null = null;
+const saveInvoice = async (isDraft: boolean) => {
     try {
+      // Sync seller company details
+      await fetch('/api/company', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: sender.company,
+          vat: sender.vat,
+          address1: sender.address,
+          city: sender.city,
+          country: sender.country,
+          iban: sender.iban,
+          logoUrl: logo || undefined,
+          bankName: sender.bankName,
+          bic: sender.bic,
+        }),
+      });
+    } catch {}
+    try {
+      // Save draft or ready invoice
       const res = await fetch('/api/drafts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -482,39 +496,88 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
           subtotal: Math.round(subtotal),
           tax: Math.round(taxTotal),
           total: Math.round(total),
-          items: items.map((it) => ({ description: it.desc, quantity: it.qty, rate: it.rate, tax: it.tax })),
+          due: invoiceMeta.due,
+          clientMeta: {
+            vat: client.vat,
+            address: client.address,
+            city: client.city,
+            country: client.country,
+            iban: client.iban,
+            bankName: client.bankName,
+            bic: client.bic,
+          },
+          items: items.map((it) => ({
+            description: it.desc,
+            quantity: it.qty,
+            rate: it.rate,
+            tax: it.tax,
+          })),
         }),
       });
-      if (!res.ok) throw new Error((await res.json().catch(() => ({ error: 'Failed' }))).error || 'Failed to save draft');
+      if (!res.ok) throw new Error((await res.json().catch(() => ({ error: 'Failed' }))).error || 'Failed to save invoice');
       const { invoice } = await res.json();
-      try {
-        setInvoiceMeta((prev) => ({ ...prev, number: String(invoice.number || prev.number), date: new Date(invoice.date).toISOString().slice(0, 10) }));
-      } catch {}
-      invoiceId = invoice.id as string;
+      if (!isDraft) {
+        // Mark as Ready
+        await fetch(`/api/invoices/${invoice.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            status: 'Ready',
+            subtotal: Math.round(subtotal),
+            tax: Math.round(taxTotal),
+            total: Math.round(total),
+          }),
+        });
+      }
+      return invoice;
+    } catch (e) {
+      return null;
+    }
+  };
 
-      const readyRes = await fetch(`/api/invoices/${invoiceId}`, {
-        method: 'PATCH',
+const sendEmail = async () => {
+    if (!signedIn) return;
+    if (tokenBalance !== null && tokenBalance < 10) {
+      setBanner({ type: 'error', msg: 'Not enough tokens (10 required).' });
+      return;
+    }
+    setBusy('email');
+    setBanner(null);
+    try {
+      // 1. Сохраняем инвойс как "Ready" (isDraft = false)
+      const savedInvoice = await saveInvoice(false);
+      if (!savedInvoice || !savedInvoice.id) {
+        throw new Error("Could not save invoice before sending.");
+      }
+
+      // 2. Спрашиваем email
+      const recipientEmail = prompt("Please enter the recipient's email address:", client.email);
+      if (!recipientEmail) {
+        setBusy(null);
+        return;
+      }
+
+      // 3. Отправляем на наш API
+      setBanner({ type: 'success', msg: 'Sending email...' });
+      const res = await fetch(`/api/invoices/send`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'Ready', subtotal: Math.round(subtotal), tax: Math.round(taxTotal), total: Math.round(total) }),
+        body: JSON.stringify({ email: recipientEmail, invoiceId: savedInvoice.id }),
       });
-      if (!readyRes.ok) throw new Error((await readyRes.json().catch(() => ({ error: 'Failed' }))).error || 'Failed to mark Ready');
-      const j = await readyRes.json();
-      if (typeof j.tokenBalance === 'number') {
-        setTokenBalance(j.tokenBalance);
-        try { bcRef.current?.postMessage({ type: 'tokens-updated', tokenBalance: j.tokenBalance }); } catch {}
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || 'Failed to send email.');
       }
 
-      // Placeholder for future email flow
-      setBanner({ type: 'success', msg: 'Email queued (mock).' });
+      setBanner({ type: 'success', msg: 'Email sent successfully!' });
     } catch (e: any) {
-      if (invoiceId) {
-        try { await fetch(`/api/invoices/${invoiceId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'Error' }) }); } catch {}
-      }
       setBanner({ type: 'error', msg: e.message || 'Failed to queue email.' });
     } finally {
       setBusy(null);
     }
   };
+  // ==========================================================
 
   return (
     <div className="space-y-6">
@@ -683,6 +746,7 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
             </div>
             <div className="grid sm:grid-cols-2 gap-3">
               <Input label="Client name" value={client.name} onChange={(e) => setClient((c) => ({ ...c, name: e.target.value }))} />
+              <Input label="Client email" type="email" value={client.email} onChange={(e) => setClient((c) => ({ ...c, email: e.target.value }))} />
               <Input label="VAT / Reg" value={client.vat} onChange={(e) => setClient((c) => ({ ...c, vat: e.target.value }))} />
               <Input label="Address line" value={client.address} onChange={(e) => setClient((c) => ({ ...c, address: e.target.value }))} />
               <Input label="City" value={client.city} onChange={(e) => setClient((c) => ({ ...c, city: e.target.value }))} />
