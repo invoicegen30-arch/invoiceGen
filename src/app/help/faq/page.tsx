@@ -8,8 +8,6 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 
-export const metadata = { title: 'FAQ - Invoicerly' };
-
 type FAQCategory = 'tokens' | 'vat' | 'pdf' | 'account' | 'integrations';
 type FAQItem = {
   id: string;
