@@ -14,6 +14,10 @@ const absoluteUrl = (path: string) => {
 // Функция теперь принимает только один аргумент `req`
 export async function POST(req: Request) {
   try {
+    console.log(`[INVOICE_SEND] Starting email send process`);
+    console.log(`[INVOICE_SEND] RESEND_API_KEY exists: ${!!process.env.RESEND_API_KEY}`);
+    console.log(`[INVOICE_SEND] EMAIL_FROM: ${process.env.EMAIL_FROM}`);
+    
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -43,15 +47,23 @@ export async function POST(req: Request) {
       );
     }
 
-    const pdfResponse = await fetch(absoluteUrl(`/api/pdf/${invoice.id}`));
+    console.log(`[INVOICE_SEND] Fetching PDF for invoice ${invoice.id}`);
+    const pdfUrl = absoluteUrl(`/api/pdf/${invoice.id}`);
+    console.log(`[INVOICE_SEND] PDF URL: ${pdfUrl}`);
+    
+    const pdfResponse = await fetch(pdfUrl);
+    console.log(`[INVOICE_SEND] PDF response status: ${pdfResponse.status}`);
+    
     if (!pdfResponse.ok) {
-      throw new Error("Failed to fetch PDF for attachment");
+      const errorText = await pdfResponse.text();
+      console.error(`[INVOICE_SEND] PDF fetch error: ${errorText}`);
+      throw new Error(`Failed to fetch PDF for attachment: ${pdfResponse.status} ${errorText}`);
     }
     const pdfBlob = await pdfResponse.blob();
     const pdfBuffer = Buffer.from(await pdfBlob.arrayBuffer());
 
     await resend.emails.send({
-      from: `Invoicerly <${process.env.EMAIL_FROM || "no-reply@invoicerly.co.uk"}>`,
+      from: `Invoicerly <${process.env.EMAIL_FROM || "info@invoicerly.co.uk"}>`,
       to: toEmail,
       subject: `Invoice ${invoice.number} from ${invoice.user?.company?.name || "Invoicerly"}`,
       html: `<p>Please find your invoice attached.</p>`,
