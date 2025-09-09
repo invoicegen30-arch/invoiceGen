@@ -81,7 +81,8 @@ export default function TokenCalculatorPage() {
     setInvoicesNeeded(Math.max(1, numValue));
   };
 
-  const handleCurrencyChange = (newCurrency: Currency) => {
+  const handleCurrencyChange = (value: string) => {
+    const newCurrency = value as Currency;
     setCurrency(newCurrency);
     
     if (typeof window !== 'undefined') {
