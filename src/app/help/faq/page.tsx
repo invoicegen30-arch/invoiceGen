@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -127,7 +127,7 @@ const CATEGORIES = [
   { id: 'integrations', label: 'Integrations', color: 'bg-pink-100 text-pink-800' },
 ] as const;
 
-export default function FAQPage() {
+function FAQContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
@@ -434,6 +434,23 @@ export default function FAQPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function FAQPage() {
+  return (
+    <Suspense fallback={
+      <main className="bg-slate-50 min-h-screen">
+        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-slate-900 mb-4">Frequently asked questions</h1>
+            <p className="text-lg text-slate-600">Loading...</p>
+          </div>
+        </section>
+      </main>
+    }>
+      <FAQContent />
+    </Suspense>
   );
 }
 
