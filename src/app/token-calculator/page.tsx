@@ -379,7 +379,10 @@ function ExampleCard({
   const costPerInvoice = amount / invoices;
 
   return (
-    <Card className="p-4 cursor-pointer hover:bg-slate-50 transition-colors" onClick={onSelect}>
+    <div 
+      className="p-4 cursor-pointer hover:bg-slate-50 transition-colors bg-white rounded-lg border border-slate-200 shadow-sm"
+      onClick={onSelect}
+    >
       <div className="text-center">
         <div className="text-2xl font-bold text-slate-900 mb-2">
           {currency === 'GBP' ? '£' : '€'}{amount}
@@ -392,6 +395,6 @@ function ExampleCard({
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }
