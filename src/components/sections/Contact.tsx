@@ -39,10 +39,10 @@ export default function Contact() {
           <h2 className="text-2xl font-bold">Contact us</h2>
           <p className="mt-2 text-slate-600">Leave a message - we'll reply within one business day.</p>
           <div className="mt-6 grid gap-3 text-sm text-slate-700">
-            <div>Company: PREPARING BUSINESS LTD</div>
-            <div>Reg: 16107292 - VAT: on request</div>
-            <div>Address: Dept 6189 43 Owston Road, Carcroft, Doncaster, UK, DN6 8DA</div>
-            <div>Email: info@shapeai.co.uk</div>
+            <div>Company: GET STUFFED LTD</div>
+            <div>Reg: 15673179</div>
+            <div>Address: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET</div>
+            <div>Email: info@invoicerly.co.uk</div>
             <div>Phone: +44 7822016497</div>
           </div>
         </motion.div>
