@@ -350,6 +350,7 @@ export default function FAQPage() {
                   onSubmitContact={() => submitContactForm(item.id)}
                   onCloseContact={() => setShowContactForm(null)}
                   highlightQuery={searchQuery}
+                  highlightText={highlightText}
                 />
               ))}
             </div>
@@ -388,6 +389,7 @@ export default function FAQPage() {
                     onSubmitContact={() => submitContactForm(item.id)}
                     onCloseContact={() => setShowContactForm(null)}
                     highlightQuery={searchQuery}
+                    highlightText={highlightText}
                   />
                 ))}
               </div>
@@ -450,6 +452,7 @@ function FAQCard({
   onSubmitContact,
   onCloseContact,
   highlightQuery,
+  highlightText,
 }: {
   item: FAQItem;
   isExpanded: boolean;
@@ -465,6 +468,7 @@ function FAQCard({
   onSubmitContact: () => void;
   onCloseContact: () => void;
   highlightQuery: string;
+  highlightText: (text: string, query: string) => React.ReactNode;
 }) {
   return (
     <Card className="overflow-hidden">
