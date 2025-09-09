@@ -571,14 +571,14 @@ const sendEmail = async () => {
 
       // 3. Отправляем на наш API
       setBanner({ type: 'success', msg: 'Sending email...' });
-      const res = await fetch(`/api/invoices/send`, {
+      const emailRes = await fetch(`/api/invoices/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: recipientEmail, invoiceId: savedInvoice.id }),
       });
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
+      if (!emailRes.ok) {
+        const data = await emailRes.json().catch(() => ({}));
         throw new Error(data.message || 'Failed to send email.');
       }
 
