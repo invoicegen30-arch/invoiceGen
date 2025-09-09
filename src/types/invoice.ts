@@ -28,6 +28,7 @@ export interface InvoiceData {
     address: string;
     city: string;
     country: string;
+    email?: string;
   };
   invoice: {
     number: string;
@@ -48,5 +49,6 @@ export interface CountryCode {
 export interface VatRates {
   [countryCode: string]: number[];
 }
+
 
 

@@ -12,7 +12,7 @@ interface InvoicePaperProps {
   taxTotal: number;
   total: number;
   sender: { company: string; vat: string; address: string; city: string; country: string; iban: string; bankName?: string; bic?: string };
-  client: { name: string; vat: string; address: string; city: string; country: string };
+  client: { name: string; vat: string; address: string; city: string; country: string; email?: string };
   invoiceNo: string;
   invoiceDate: string;
   invoiceDue: string;
@@ -70,6 +70,7 @@ export default function InvoicePaper({
         <div>
           <div className="font-semibold">Bill To</div>
           <div>{client.name}</div>
+          {client.email && <div className="text-slate-600">{client.email}</div>}
           <div>VAT {client.vat}</div>
           <div>{client.city}, {client.country}</div>
         </div>
@@ -143,5 +144,6 @@ export default function InvoicePaper({
     </motion.div>
   );
 }
+
 
 

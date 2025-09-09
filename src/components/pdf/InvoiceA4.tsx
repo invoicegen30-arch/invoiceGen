@@ -27,6 +27,7 @@ export interface InvoiceA4Props {
     address?: string;
     city?: string;
     country?: string;
+    email?: string;
   };
   invoiceNo: string;
   invoiceDate: string;
@@ -125,6 +126,7 @@ export default function InvoiceA4({
               <div className="label">Bill To</div>
               <div className="mt-1 text-sm">
                 <div className="font-semibold">{client.name}</div>
+                {client.email && <div className="muted">{client.email}</div>}
                 {client.vat && <div className="muted">VAT {client.vat}</div>}
                 {client.address && <div>{client.address}</div>}
                 {(client.city || client.country) && <div>{client.city}{client.city && client.country ? ', ' : ''}{client.country}</div>}

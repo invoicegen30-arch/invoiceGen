@@ -390,27 +390,31 @@ export default function DashboardClient() {
               onShare={async()=>{ const r = await markReadyIfDraft(viewInv.id); if(!r.ok){ alert(r.err||'Failed'); return;} const url = `${window.location.origin}/s/${viewInv.id}`; await navigator.clipboard.writeText(url); alert('Share link copied'); }}
               onSendEmail={async () => {
                 const clientEmail = (viewInv.clientMeta?.email as string) || '';
-                const recipientEmail = prompt("Please enter the recipient's email address:", clientEmail);
+                
+                if (!clientEmail) {
+                  alert('Please add client email address first in the Edit mode.');
+                  return;
+                }
 
-                if (recipientEmail) {
-                  const r = await markReadyIfDraft(viewInv.id);
-                  if (r.ok) {
-                    try {
-                      // ИЗМЕНЕНО: URL теперь /api/invoices/send
-                      const res = await fetch(`/api/invoices/send`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        // ИЗМЕНЕНО: Добавляем invoiceId в тело запроса
-                        body: JSON.stringify({ email: recipientEmail, invoiceId: viewInv.id }),
-                      });
-                      if (!res.ok) throw new Error('Failed to send email.');
-                      alert('Email queued successfully!');
-                    } catch {
-                      alert('Error sending email. Please try again.');
-                    }
-                  } else {
-                    alert(r.err || 'Failed to prepare invoice for sending.');
+                const recipientEmail = prompt("Please enter the recipient's email address:", clientEmail);
+                if (!recipientEmail) return;
+
+                const r = await markReadyIfDraft(viewInv.id);
+                if (r.ok) {
+                  try {
+                    const res = await fetch(`/api/invoices/send`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ email: recipientEmail, invoiceId: viewInv.id }),
+                    });
+                    if (!res.ok) throw new Error('Failed to send email.');
+                    alert('Email sent successfully!');
+                  } catch (error) {
+                    console.error('Email send error:', error);
+                    alert('Error sending email. Please try again.');
                   }
+                } else {
+                  alert(r.err || 'Failed to prepare invoice for sending.');
                 }
               }}
               onSave={async(next)=>{
@@ -468,12 +472,13 @@ function ModalInvoiceView({ invoice, onClose, onDownload, onSendEmail, onShare, 
 }) {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<{ client: string; subtotal: number; tax: number; total: number }>({ client: invoice.client, subtotal: invoice.subtotal, tax: invoice.tax, total: invoice.total });
-  const [client, setClient] = useState<{ name: string; vat: string; address: string; city: string; country: string }>({
+  const [client, setClient] = useState<{ name: string; vat: string; address: string; city: string; country: string; email: string }>({
     name: invoice.client || '',
     vat: (invoice.clientMeta?.vat as string) || '',
     address: (invoice.clientMeta?.address as string) || '',
     city: (invoice.clientMeta?.city as string) || '',
     country: (invoice.clientMeta?.country as string) || '',
+    email: (invoice.clientMeta?.email as string) || '',
   });
   const [company, setCompany] = useState<any>({
     name: invoice.user?.company?.name || '',
@@ -510,6 +515,7 @@ function ModalInvoiceView({ invoice, onClose, onDownload, onSendEmail, onShare, 
       address: (invoice.clientMeta?.address as string) || '',
       city: (invoice.clientMeta?.city as string) || '',
       country: (invoice.clientMeta?.country as string) || '',
+      email: (invoice.clientMeta?.email as string) || '',
     });
     setCompany({
       name: invoice.user?.company?.name || '',
@@ -557,7 +563,7 @@ function ModalInvoiceView({ invoice, onClose, onDownload, onSendEmail, onShare, 
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                       client: client.name,
-                      clientMeta: { vat: client.vat, address: client.address, city: client.city, country: client.country, iban: (client as any).iban || '', bankName: (client as any).bankName || '', bic: (client as any).bic || '' },
+                      clientMeta: { vat: client.vat, address: client.address, city: client.city, country: client.country, email: client.email, iban: (client as any).iban || '', bankName: (client as any).bankName || '', bic: (client as any).bic || '' },
                       items: items.map(it=>({ description: it.desc, quantity: it.qty, rate: it.rate, tax: it.tax }))
                     })
                   });
@@ -612,6 +618,7 @@ function ModalInvoiceView({ invoice, onClose, onDownload, onSendEmail, onShare, 
             <div className="grid gap-2">
               <div className="text-sm font-semibold">Client</div>
               <input className="rounded border px-2 py-1 text-sm" placeholder="Client name" value={client.name} onChange={(e)=>setClient({ ...client, name: e.target.value })} />
+              <input className="rounded border px-2 py-1 text-sm" placeholder="Email address" type="email" value={client.email} onChange={(e)=>setClient({ ...client, email: e.target.value })} />
               <div className="grid grid-cols-2 gap-2">
                 <input className="rounded border px-2 py-1 text-sm" placeholder="VAT" value={client.vat} onChange={(e)=>setClient({ ...client, vat: e.target.value })} />
                 <input className="rounded border px-2 py-1 text-sm" placeholder="City" value={client.city} onChange={(e)=>setClient({ ...client, city: e.target.value })} />

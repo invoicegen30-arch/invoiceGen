@@ -300,7 +300,7 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
           tax: Math.round(taxTotal),
           total: Math.round(total),
           due: invoiceMeta.due,
-          clientMeta: { vat: client.vat, address: client.address, city: client.city, country: client.country, iban: client.iban, bankName: client.bankName, bic: client.bic },
+          clientMeta: { vat: client.vat, address: client.address, city: client.city, country: client.country, email: client.email, iban: client.iban, bankName: client.bankName, bic: client.bic },
           items: items.map((it) => ({ description: it.desc, quantity: it.qty, rate: it.rate, tax: it.tax })),
         }),
       });
@@ -395,7 +395,7 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
           tax: Math.round(taxTotal),
           total: Math.round(total),
           due: invoiceMeta.due,
-          clientMeta: { vat: client.vat, address: client.address, city: client.city, country: client.country, iban: client.iban, bankName: client.bankName, bic: client.bic },
+          clientMeta: { vat: client.vat, address: client.address, city: client.city, country: client.country, email: client.email, iban: client.iban, bankName: client.bankName, bic: client.bic },
           items: items.map((it) => ({ description: it.desc, quantity: it.qty, rate: it.rate, tax: it.tax })),
         }),
       });
@@ -430,7 +430,7 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
           tax: Math.round(taxTotal),
           total: Math.round(total),
           due: invoiceMeta.due,
-          clientMeta: { vat: client.vat, address: client.address, city: client.city, country: client.country, iban: client.iban, bankName: client.bankName, bic: client.bic },
+          clientMeta: { vat: client.vat, address: client.address, city: client.city, country: client.country, email: client.email, iban: client.iban, bankName: client.bankName, bic: client.bic },
           items: items.map((it) => ({ description: it.desc, quantity: it.qty, rate: it.rate, tax: it.tax })),
         }),
       });
@@ -502,6 +502,7 @@ const saveInvoice = async (isDraft: boolean) => {
             address: client.address,
             city: client.city,
             country: client.country,
+            email: client.email,
             iban: client.iban,
             bankName: client.bankName,
             bic: client.bic,
