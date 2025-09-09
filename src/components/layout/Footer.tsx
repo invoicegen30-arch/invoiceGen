@@ -20,8 +20,6 @@ export default function Footer() {
               <Link href="/generator" className="hover:underline">Invoice Generator</Link>
               <Link href="/pricing" className="hover:underline">Pricing</Link>
               <Link href="/token-calculator" className="hover:underline">Token Calculator</Link>
-              <a className="hover:underline" href="#" aria-disabled>Changelog</a>
-              <a className="hover:underline" href="#" aria-disabled>Status</a>
             </div>
           </div>
           <div>
@@ -31,7 +29,6 @@ export default function Footer() {
               <Link href="/help/getting-started" className="hover:underline">Getting Started</Link>
               <Link href="/help/billing-tokens" className="hover:underline">Billing & Tokens</Link>
               <Link href="/help/troubleshooting" className="hover:underline">Troubleshooting</Link>
-              <a className="hover:underline" href="#" aria-disabled>VAT Guide</a>
             </div>
           </div>
           <div>
@@ -41,10 +38,6 @@ export default function Footer() {
               <Link href="/terms" className="hover:underline">Terms</Link>
               <Link href="/cookies" className="hover:underline">Cookie</Link>
               <Link href="/refund" className="hover:underline">Refund</Link>
-              <a className="hover:underline" href="#" aria-disabled>DPA</a>
-              <a className="hover:underline" href="#" aria-disabled>Subprocessors</a>
-              <a className="hover:underline" href="#" aria-disabled>Accessibility</a>
-              <a className="hover:underline" href="#" aria-disabled>Security</a>
             </div>
           </div>
           <div>
