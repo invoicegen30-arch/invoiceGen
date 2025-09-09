@@ -31,6 +31,8 @@ export default function TokenCalculatorPage() {
   const [currency, setCurrency] = useState<Currency>('GBP');
   const [amount, setAmount] = useState(50);
   const [invoicesNeeded, setInvoicesNeeded] = useState(5);
+  const [isUpdatingFromAmount, setIsUpdatingFromAmount] = useState(false);
+  const [isUpdatingFromInvoices, setIsUpdatingFromInvoices] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -46,26 +48,30 @@ export default function TokenCalculatorPage() {
   const calculatedInvoices = Math.floor(tokens / 10);
   const effectiveCostPerInvoice = amount / calculatedInvoices;
 
-  // Sync invoices needed with amount (only when invoices input changes)
+  // Sync invoices needed with amount (only when amount changes and not from invoices input)
   useEffect(() => {
-    const newAmount = Math.max(MIN_AMOUNT, Math.min(MAX_AMOUNT, invoicesNeeded * 0.1));
-    if (Math.abs(newAmount - amount) > 0.01) {
-      setAmount(Math.round(newAmount * 100) / 100);
+    if (!isUpdatingFromInvoices && !isUpdatingFromAmount) {
+      const newInvoices = Math.floor(tokens / 10);
+      if (newInvoices !== invoicesNeeded && newInvoices > 0) {
+        setInvoicesNeeded(newInvoices);
+      }
     }
-  }, [invoicesNeeded]);
-
-  // Sync amount with invoices needed (only when amount changes)
-  useEffect(() => {
-    const newInvoices = Math.floor(tokens / 10);
-    if (newInvoices !== invoicesNeeded && newInvoices > 0) {
-      setInvoicesNeeded(newInvoices);
-    }
-  }, [amount]);
+  }, [amount, tokens, invoicesNeeded, isUpdatingFromInvoices, isUpdatingFromAmount]);
 
   const handleAmountChange = (value: string) => {
     const numValue = parseFloat(value) || 0;
     const clampedValue = Math.max(MIN_AMOUNT, Math.min(MAX_AMOUNT, numValue));
+    
+    setIsUpdatingFromAmount(true);
     setAmount(clampedValue);
+    
+    // Update invoices after amount change
+    const newInvoices = Math.floor(clampedValue * 100 / 10);
+    setInvoicesNeeded(newInvoices);
+    
+    setTimeout(() => {
+      setIsUpdatingFromAmount(false);
+    }, 0);
     
     if (typeof window !== 'undefined') {
       // @ts-ignore
@@ -78,7 +84,18 @@ export default function TokenCalculatorPage() {
 
   const handleInvoicesChange = (value: string) => {
     const numValue = parseInt(value) || 0;
-    setInvoicesNeeded(Math.max(1, numValue));
+    const newInvoices = Math.max(1, numValue);
+    
+    setIsUpdatingFromInvoices(true);
+    setInvoicesNeeded(newInvoices);
+    
+    // Update amount after invoices change
+    const newAmount = Math.max(MIN_AMOUNT, Math.min(MAX_AMOUNT, newInvoices * 0.1));
+    setAmount(Math.round(newAmount * 100) / 100);
+    
+    setTimeout(() => {
+      setIsUpdatingFromInvoices(false);
+    }, 0);
   };
 
   const handleCurrencyChange = (value: string) => {
