@@ -285,6 +285,7 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
     }
     setBusy('download');
     setBanner(null);
+    let createdInvoiceId: string | null = null;
     try {
       // Sync seller company details first
       try {
@@ -327,6 +328,7 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
       }
       
       const { invoice, tokenBalance } = await res.json();
+      createdInvoiceId = invoice.id as string;
       if (!invoice || !invoice.id) {
         throw new Error("Could not create invoice for download.");
       }
@@ -387,8 +389,8 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
         setBanner({ type: 'success', msg: 'PDF downloaded.' });
       }
     } catch (e: any) {
-      if (invoice?.id) {
-        try { await fetch(`/api/invoices/${invoice.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'Error' }) }); } catch {}
+      if (createdInvoiceId) {
+        try { await fetch(`/api/invoices/${createdInvoiceId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'Error' }) }); } catch {}
       }
       setBanner({ type: 'error', msg: e.message || 'PDF download failed.' });
     } finally {
