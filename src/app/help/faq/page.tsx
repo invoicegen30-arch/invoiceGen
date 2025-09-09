@@ -467,7 +467,7 @@ function FAQCard({
   highlightQuery: string;
 }) {
   return (
-    <Card className="overflow-hidden" padding="none">
+    <Card className="overflow-hidden">
       <button
         onClick={onToggle}
         className="w-full text-left p-6 hover:bg-slate-50 transition-colors"
