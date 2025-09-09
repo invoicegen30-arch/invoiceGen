@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import chromium from "@sparticuz/chromium";
+import puppeteer from "puppeteer-core";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -47,20 +49,49 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log(`[INVOICE_SEND] Fetching PDF for invoice ${invoice.id}`);
-    const pdfUrl = absoluteUrl(`/api/pdf/${invoice.id}`);
-    console.log(`[INVOICE_SEND] PDF URL: ${pdfUrl}`);
+    console.log(`[INVOICE_SEND] Generating PDF for invoice ${invoice.id}`);
     
-    const pdfResponse = await fetch(pdfUrl);
-    console.log(`[INVOICE_SEND] PDF response status: ${pdfResponse.status}`);
+    // Generate PDF directly instead of fetching from API
+    const baseUrl = process.env.NEXTAUTH_URL || process.env.VERCEL_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const origin = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
+    const printUrl = `${origin}/print/${invoice.id}`;
     
-    if (!pdfResponse.ok) {
-      const errorText = await pdfResponse.text();
-      console.error(`[INVOICE_SEND] PDF fetch error: ${errorText}`);
-      throw new Error(`Failed to fetch PDF for attachment: ${pdfResponse.status} ${errorText}`);
+    console.log(`[INVOICE_SEND] Print URL: ${printUrl}`);
+    
+    const isLocal = process.env.NODE_ENV === 'development';
+    const execPath = isLocal ? undefined : await chromium.executablePath();
+    
+    const browser = await puppeteer.launch({
+      args: isLocal ? [] : chromium.args,
+      defaultViewport: { width: 1240, height: 1754, deviceScaleFactor: 2 },
+      executablePath: execPath,
+      headless: chromium.headless,
+    });
+    
+    let pdfBuffer: Buffer;
+    try {
+      const page = await browser.newPage();
+      console.log(`[INVOICE_SEND] Navigating to: ${printUrl}`);
+      await page.goto(printUrl, { 
+        waitUntil: ['domcontentloaded', 'networkidle0'],
+        timeout: 30000
+      });
+      console.log(`[INVOICE_SEND] Page loaded, generating PDF...`);
+      
+      pdfBuffer = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        margin: { top: '14mm', right: '14mm', bottom: '16mm', left: '14mm' },
+        preferCSSPageSize: true,
+      });
+      
+      console.log(`[INVOICE_SEND] PDF generated, size: ${pdfBuffer.length} bytes`);
+    } catch (pdfError) {
+      console.error(`[INVOICE_SEND] PDF generation error:`, pdfError);
+      throw new Error(`Failed to generate PDF: ${pdfError instanceof Error ? pdfError.message : 'Unknown error'}`);
+    } finally {
+      try { await browser.close(); } catch {}
     }
-    const pdfBlob = await pdfResponse.blob();
-    const pdfBuffer = Buffer.from(await pdfBlob.arrayBuffer());
 
     await resend.emails.send({
       from: `Invoicerly <${process.env.EMAIL_FROM || "info@invoicerly.co.uk"}>`,
