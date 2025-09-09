@@ -387,8 +387,8 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
         setBanner({ type: 'success', msg: 'PDF downloaded.' });
       }
     } catch (e: any) {
-      if (invoiceId) {
-        try { await fetch(`/api/invoices/${invoiceId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'Error' }) }); } catch {}
+      if (invoice?.id) {
+        try { await fetch(`/api/invoices/${invoice.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'Error' }) }); } catch {}
       }
       setBanner({ type: 'error', msg: e.message || 'PDF download failed.' });
     } finally {
