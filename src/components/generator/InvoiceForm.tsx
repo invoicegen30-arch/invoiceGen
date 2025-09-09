@@ -362,7 +362,7 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
 
       const imgData = canvas.toDataURL('image/png');
       try {
-        const res = await fetch(`/api/pdf/${invoiceId}?due=${encodeURIComponent(invoiceMeta.due || '')}`);
+        const res = await fetch(`/api/pdf/${invoice.id}?due=${encodeURIComponent(invoiceMeta.due || '')}`);
         if (res.ok) {
           const blob = await res.blob();
           const url = URL.createObjectURL(blob);
