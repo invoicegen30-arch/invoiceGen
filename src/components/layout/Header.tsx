@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
@@ -25,6 +25,8 @@ export default function Header() {
     try { return (localStorage.getItem('currency') as 'GBP'|'EUR') || 'GBP'; } catch { return 'GBP'; }
   });
   const [helpOpen, setHelpOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileHelpOpen, setMobileHelpOpen] = useState(false);
 
   useEffect(() => {
     const t = (session?.user as any)?.tokenBalance;
@@ -59,6 +61,22 @@ export default function Header() {
   const onKeyDownHelp: React.KeyboardEventHandler<HTMLButtonElement> = (e) => {
     if (e.key === 'Escape') setHelpOpen(false);
   };
+
+  const openMobile = () => setMobileOpen(true);
+  const closeMobile = () => setMobileOpen(false);
+  const toggleMobile = () => setMobileOpen((v)=>!v);
+  const toggleMobileHelp = () => setMobileHelpOpen((v)=>!v);
+
+  // Close mobile menu on route change
+  useEffect(() => { setMobileOpen(false); setMobileHelpOpen(false); }, [pathname]);
+
+  // ESC to close mobile menu
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeMobile(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mobileOpen]);
 
   return (
     <motion.header 
@@ -111,7 +129,7 @@ export default function Header() {
           </nav>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="hidden sm:flex items-center gap-3">
           <div className="hidden md:block">
             <Segmented
               options={[{ label: 'GBP', value: 'GBP' }, { label: 'EUR', value: 'EUR' }]}
@@ -149,7 +167,133 @@ export default function Header() {
             </div>
           )}
         </div>
+
+        {/* Burger button (mobile only) */}
+        <div className="sm:hidden">
+          <button
+            aria-label="Open menu"
+            className="rounded-xl border border-black/10 bg-white p-2 text-slate-700 hover:bg-slate-50"
+            onClick={toggleMobile}
+          >
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+        </div>
       </section>
+
+      {/* Mobile menu overlay */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              className="fixed inset-0 z-50 bg-black/30"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeMobile}
+            />
+            {/* Panel */}
+            <motion.aside
+              className="fixed right-0 top-0 z-50 h-full w-80 max-w-[90%] bg-white border-l border-black/10 shadow-xl flex flex-col"
+              role="dialog"
+              aria-modal="true"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'tween', duration: 0.25 }}
+            >
+              <div className="flex items-center justify-between px-4 py-3 border-b border-black/10">
+                <div className="text-sm font-semibold">Menu</div>
+                <button aria-label="Close menu" onClick={closeMobile} className="rounded-xl p-2 hover:bg-slate-50">
+                  <svg className="h-5 w-5 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto px-4 py-3 text-sm">
+                <nav className="grid gap-1">
+                  <Link href="/generator" className={`rounded-xl px-3 py-2 hover:bg-slate-50 ${isGenerator ? 'bg-black/5' : ''}`} onClick={closeMobile}>Invoice Generator</Link>
+                  {signedIn && (
+                    <Link href="/dashboard" className={`rounded-xl px-3 py-2 hover:bg-slate-50 ${isDashboard ? 'bg-black/5' : ''}`} onClick={closeMobile}>Dashboard</Link>
+                  )}
+                  <Link href="/pricing" className={`rounded-xl px-3 py-2 hover:bg-slate-50 ${isPricing ? 'bg-black/5' : ''}`} onClick={closeMobile}>Top-Up</Link>
+                  <Link href="/token-calculator" className={`rounded-xl px-3 py-2 hover:bg-slate-50 ${isTokenCalc ? 'bg-black/5' : ''}`} onClick={closeMobile}>Token Calculator</Link>
+
+                  {/* Help group */}
+                  <button
+                    className={`mt-1 rounded-xl px-3 py-2 text-left flex items-center justify-between hover:bg-slate-50 ${mobileHelpOpen ? 'bg-black/5' : ''}`}
+                    onClick={toggleMobileHelp}
+                    aria-expanded={mobileHelpOpen}
+                    aria-controls="mobile-help-group"
+                  >
+                    <span>Help</span>
+                    <svg className={`h-4 w-4 transition-transform ${mobileHelpOpen ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </button>
+                  <AnimatePresence initial={false}>
+                    {mobileHelpOpen && (
+                      <motion.div
+                        id="mobile-help-group"
+                        className="ml-2 grid gap-1"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                      >
+                        <Link href="/help/faq" className="rounded-xl px-3 py-2 hover:bg-slate-50" onClick={closeMobile}>FAQ</Link>
+                        <Link href="/help/getting-started" className="rounded-xl px-3 py-2 hover:bg-slate-50" onClick={closeMobile}>Getting Started</Link>
+                        <Link href="/help/billing-tokens" className="rounded-xl px-3 py-2 hover:bg-slate-50" onClick={closeMobile}>Billing & Tokens</Link>
+                        <Link href="/help/troubleshooting" className="rounded-xl px-3 py-2 hover:bg-slate-50" onClick={closeMobile}>Troubleshooting</Link>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <Link href="/about" className={`mt-1 rounded-xl px-3 py-2 hover:bg-slate-50 ${isAbout ? 'bg-black/5' : ''}`} onClick={closeMobile}>About</Link>
+                </nav>
+
+                {/* Currency */}
+                <div className="mt-4">
+                  <div className="mb-2 text-xs text-slate-500">Currency</div>
+                  <Segmented
+                    options={[{ label: 'GBP', value: 'GBP' }, { label: 'EUR', value: 'EUR' }]}
+                    value={currency}
+                    onChange={(v)=>onCurrencyChange(v as 'GBP'|'EUR')}
+                  />
+                </div>
+
+                {/* Auth / Account */}
+                <div className="mt-4 grid gap-2">
+                  {!signedIn ? (
+                    <>
+                      <Link href="/auth/signin?mode=login" className="rounded-xl bg-slate-900 hover:bg-black text-white px-4 py-2 text-sm text-center" onClick={closeMobile}>Log in</Link>
+                      <Link href="/auth/signin?mode=signup" className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm text-center" onClick={closeMobile}>Sign up</Link>
+                    </>
+                  ) : (
+                    <>
+                      <div className="rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-slate-700">
+                        Tokens: {typeof tokens === 'number' ? tokens : ((session?.user as any)?.tokenBalance ?? 0)}
+                      </div>
+                      <Link href="/pricing" className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm text-center" onClick={closeMobile}>Top-Up</Link>
+                      <button
+                        onClick={() => { closeMobile(); signOut({ callbackUrl: '/' }); }}
+                        className="rounded-xl bg-slate-900 hover:bg-black text-white px-4 py-2 text-sm"
+                      >
+                        Sign out
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 }
