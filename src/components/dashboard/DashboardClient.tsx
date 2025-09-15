@@ -672,6 +672,15 @@ function ModalInvoiceView({ invoice, onClose, onDownload, onSendEmail, onRefresh
                 <button className="rounded border border-dashed border-black/20 text-sm py-1" onClick={(e)=>{ e.preventDefault(); setItems(prev=>[...prev, { desc: 'Service', qty: 1, rate: 100, tax: 0 }]); }}>+ Add row</button>
               </div>
             </div>
+
+            <div className="grid gap-2">
+              <div className="text-sm font-semibold">Invoice Details</div>
+              <div className="grid grid-cols-3 gap-2">
+                <input className="rounded border px-2 py-1 text-sm" placeholder="Invoice number" value={invoice.number} readOnly />
+                <input className="rounded border px-2 py-1 text-sm" type="date" value={new Date(invoice.date).toISOString().slice(0,10)} readOnly />
+                <input className="rounded border px-2 py-1 text-sm" type="date" placeholder="Due date" value={invoice.due ? new Date(invoice.due).toISOString().slice(0,10) : ''} readOnly />
+              </div>
+            </div>
           </div>
         )}
       </div>
