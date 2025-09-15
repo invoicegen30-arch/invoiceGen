@@ -10,9 +10,9 @@ import { THEME } from '@/lib/theme';
 
 export default function Pricing() {
   const bcRef = useRef<BroadcastChannel | null>(null);
-  const [currency, setCurrency] = useState<'GBP'|'EUR'>(()=>{
+  const [currency, setCurrency] = useState<'GBP'|'EUR'|'AUD'>(()=>{
     if (typeof window === 'undefined') return 'GBP';
-    try { return (localStorage.getItem('currency') as 'GBP'|'EUR') || 'GBP'; } catch { return 'GBP'; }
+    try { return (localStorage.getItem('currency') as 'GBP'|'EUR'|'AUD') || 'GBP'; } catch { return 'GBP'; }
   });
 
   useEffect(()=>{
@@ -20,7 +20,7 @@ export default function Pricing() {
       bcRef.current = new BroadcastChannel('app-events');
       bcRef.current.onmessage = (ev: MessageEvent) => {
         const data: any = (ev as any)?.data || {};
-        if (data.type === 'currency-updated' && (data.currency === 'GBP' || data.currency === 'EUR')) {
+        if (data.type === 'currency-updated' && (data.currency === 'GBP' || data.currency === 'EUR' || data.currency === 'AUD')) {
           setCurrency(data.currency);
           try { localStorage.setItem('currency', data.currency); } catch {}
         }
@@ -134,7 +134,7 @@ function TokensLine({ planName, priceText }: { planName: string; priceText: stri
   );
 }
 
-function CustomHomeCard({ currency }: { currency: 'GBP'|'EUR' }) {
+function CustomHomeCard({ currency }: { currency: 'GBP'|'EUR'|'AUD' }) {
   const [price, setPrice] = useState<number>(5);
   const min = 5;
   const TOKENS_PER_UNIT = 100;

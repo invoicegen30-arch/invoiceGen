@@ -7,7 +7,7 @@ import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import Segmented from '@/components/ui/Segmented';
 
-type Currency = 'GBP' | 'EUR';
+type Currency = 'GBP' | 'EUR' | 'AUD';
 
 const MIN_AMOUNT = 5;
 const MAX_AMOUNT = 500;

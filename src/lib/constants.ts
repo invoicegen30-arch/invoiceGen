@@ -46,7 +46,8 @@ export const CURRENCY_BY_COUNTRY: CurrencyData = {
   "Monaco": "EUR",
   "San Marino": "EUR",
   "Liechtenstein": "CHF",
-  "Vatican City": "EUR"
+  "Vatican City": "EUR",
+  "Australia": "AUD"
 };
 
 export const CC: CountryCode = {
@@ -80,7 +81,8 @@ export const CC: CountryCode = {
   "Sweden": "SE",
   "Norway": "NO",
   "Switzerland": "CH",
-  "Iceland": "IS"
+  "Iceland": "IS",
+  "Australia": "AU"
 };
 
 export const VAT_RATES: VatRates = {
@@ -114,7 +116,8 @@ export const VAT_RATES: VatRates = {
   MT: [0, 5, 7, 18],
   NO: [0, 12, 25],
   CH: [0, 2.6, 3.8, 8.1],
-  IS: [0, 11, 24]
+  IS: [0, 11, 24],
+  AU: [0, 10]
 };
 
 

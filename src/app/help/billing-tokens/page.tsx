@@ -24,7 +24,7 @@ const LEDGER_SAMPLE = [
 ];
 
 export default function BillingTokensPage() {
-  const [selectedCurrency, setSelectedCurrency] = useState<'GBP' | 'EUR'>('GBP');
+  const [selectedCurrency, setSelectedCurrency] = useState<'GBP' | 'EUR' | 'AUD'>('GBP');
   const [customAmount, setCustomAmount] = useState<number>(10);
 
   useEffect(() => {

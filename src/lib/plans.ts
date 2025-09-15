@@ -46,4 +46,4 @@ export const pricingPlans = [
 ];
 
 export type Plan = (typeof pricingPlans)[0];
-export type Currency = "GBP" | "EUR";
+export type Currency = "GBP" | "EUR" | "AUD";

@@ -6,14 +6,14 @@ import InvoiceA4 from '@/components/pdf/InvoiceA4';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 // ТИПЫ И ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-type Currency = 'GBP' | 'EUR';
+type Currency = 'GBP' | 'EUR' | 'AUD';
 type InvoiceStatus = 'Draft' | 'Ready' | 'Error' | 'Sent' | 'Paid' | 'Overdue';
 type Invoice = { id: string; number: string; date: string; client: string; currency: Currency; subtotal: number; tax: number; total: number; status: InvoiceStatus };
 type LedgerRow = { id: string; ts: string; type: 'Top-up' | 'Invoice' | 'Adjust' | 'STRIPE_PURCHASE'; delta: number; balanceAfter: number; currency?: Currency; amount?: number; receiptUrl?: string; invoiceNumber?: string };
 type Company = { name: string; vat?: string; reg?: string; address1?: string; city?: string; country?: string; iban?: string; bankName?: string; bic?: string };
 type Me = { id: string; name: string | null; email: string | null; tokenBalance: number; currency: Currency; company: Company | null };
 
-const currencySym = (c: Currency) => (c === 'GBP' ? 'GBP ' : 'EUR ');
+const currencySym = (c: Currency) => (c === 'GBP' ? 'GBP ' : c === 'EUR' ? 'EUR ' : 'AUD ');
 const fmtMoney = (n: number, c: Currency) => {
   const sym = currencySym(c);
   const abs = Math.abs(n);
