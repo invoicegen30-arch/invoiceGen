@@ -85,10 +85,6 @@ export const TEMPLATES: TemplateInfo[] = [
   { id: 'construction', name: 'Construction', status: 'preview', badge: 'Coming soon', cta: 'waitlist' },
   { id: 'it', name: 'IT Services', status: 'preview', badge: 'Coming soon', cta: 'waitlist' },
   { id: 'consulting', name: 'Consulting', status: 'preview', badge: 'Coming soon', cta: 'waitlist' },
-  { id: 'retail', name: 'Retail', status: 'preview', badge: 'Coming soon', cta: 'waitlist' },
-  { id: 'healthcare', name: 'Healthcare', status: 'preview', badge: 'Coming soon', cta: 'waitlist' },
-  { id: 'education', name: 'Education', status: 'preview', badge: 'Coming soon', cta: 'waitlist' },
-  { id: 'nonprofit', name: 'Non-profit', status: 'preview', badge: 'Coming soon', cta: 'waitlist' },
 ];
 
 
