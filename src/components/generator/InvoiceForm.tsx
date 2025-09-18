@@ -856,71 +856,73 @@ const sendEmail = async () => {
               <h3 className="text-sm font-semibold tracking-wide text-slate-800 uppercase">Preview</h3>
               <p className="text-xs text-slate-500 mt-1">A4 layout</p>
             </div>
-            {template === 'Construction' ? (
-              <InvoiceConstructionA4
-                currency={currency}
-                zeroNote={zeroNote}
-                logoUrl={logo || undefined}
-                items={items}
-                subtotal={subtotal}
-                taxTotal={taxTotal}
-                total={total}
-                sender={sender}
-                client={client}
-                invoiceNo={invoiceMeta.number}
-                invoiceDate={invoiceMeta.date}
-                invoiceDue={invoiceMeta.due}
-                notes={notes}
-              />
-            ) : template === 'IT Services' ? (
-              <InvoiceITServicesA4
-                currency={currency}
-                zeroNote={zeroNote}
-                logoUrl={logo || undefined}
-                items={items}
-                subtotal={subtotal}
-                taxTotal={taxTotal}
-                total={total}
-                sender={sender}
-                client={client}
-                invoiceNo={invoiceMeta.number}
-                invoiceDate={invoiceMeta.date}
-                invoiceDue={invoiceMeta.due}
-                notes={notes}
-              />
-            ) : template === 'Consulting' ? (
-              <InvoiceConsultingA4
-                currency={currency}
-                zeroNote={zeroNote}
-                logoUrl={logo || undefined}
-                items={items}
-                subtotal={subtotal}
-                taxTotal={taxTotal}
-                total={total}
-                sender={sender}
-                client={client}
-                invoiceNo={invoiceMeta.number}
-                invoiceDate={invoiceMeta.date}
-                invoiceDue={invoiceMeta.due}
-                notes={notes}
-              />
-            ) : (
-              <InvoicePaper
-                currency={currency}
-                zeroNote={zeroNote}
-                logoUrl={logo || undefined}
-                items={items}
-                subtotal={subtotal}
-                taxTotal={taxTotal}
-                total={total}
-                sender={sender}
-                client={client}
-                invoiceNo={invoiceMeta.number}
-                invoiceDate={invoiceMeta.date}
-                invoiceDue={invoiceMeta.due}
-                notes={notes}
-              />
-            )}
+            <TemplatePreview>
+              {template === 'Construction' ? (
+                <InvoiceConstructionA4
+                  currency={currency}
+                  zeroNote={zeroNote}
+                  logoUrl={logo || undefined}
+                  items={items}
+                  subtotal={subtotal}
+                  taxTotal={taxTotal}
+                  total={total}
+                  sender={sender}
+                  client={client}
+                  invoiceNo={invoiceMeta.number}
+                  invoiceDate={invoiceMeta.date}
+                  invoiceDue={invoiceMeta.due}
+                  notes={notes}
+                />
+              ) : template === 'IT Services' ? (
+                <InvoiceITServicesA4
+                  currency={currency}
+                  zeroNote={zeroNote}
+                  logoUrl={logo || undefined}
+                  items={items}
+                  subtotal={subtotal}
+                  taxTotal={taxTotal}
+                  total={total}
+                  sender={sender}
+                  client={client}
+                  invoiceNo={invoiceMeta.number}
+                  invoiceDate={invoiceMeta.date}
+                  invoiceDue={invoiceMeta.due}
+                  notes={notes}
+                />
+              ) : template === 'Consulting' ? (
+                <InvoiceConsultingA4
+                  currency={currency}
+                  zeroNote={zeroNote}
+                  logoUrl={logo || undefined}
+                  items={items}
+                  subtotal={subtotal}
+                  taxTotal={taxTotal}
+                  total={total}
+                  sender={sender}
+                  client={client}
+                  invoiceNo={invoiceMeta.number}
+                  invoiceDate={invoiceMeta.date}
+                  invoiceDue={invoiceMeta.due}
+                  notes={notes}
+                />
+              ) : (
+                <InvoicePaper
+                  currency={currency}
+                  zeroNote={zeroNote}
+                  logoUrl={logo || undefined}
+                  items={items}
+                  subtotal={subtotal}
+                  taxTotal={taxTotal}
+                  total={total}
+                  sender={sender}
+                  client={client}
+                  invoiceNo={invoiceMeta.number}
+                  invoiceDate={invoiceMeta.date}
+                  invoiceDue={invoiceMeta.due}
+                  notes={notes}
+                />
+              )}
+            </TemplatePreview>
             <div className="mt-3 text-[11px] text-slate-500">
               Totals (auto): Subtotal <b>
                 {currency} {subtotal.toFixed(2)}
