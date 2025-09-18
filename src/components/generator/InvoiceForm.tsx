@@ -75,6 +75,8 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
   const [paymentTerm, setPaymentTerm] = useState<'pre' | 7 | 14 | 30 | 45 | 60>(14);
   const [notes, setNotes] = useState('Add notes and comments');
   const [logo, setLogo] = useState<string | null>(null);
+  // Template selection (visual/layout preset)
+  const [template, setTemplate] = useState<'Freelance' | 'Construction' | 'IT Services' | 'Consulting'>('Freelance');
 
   const gated = !signedIn;
   const [banner, setBanner] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
@@ -725,6 +727,29 @@ const sendEmail = async () => {
                   <option value="45">45 days</option>
                   <option value="60">60 days</option>
                   <option value="pre">Pre-payment</option>
+                </select>
+              </div>
+            </div>
+
+            <hr className="my-4 border-black/10" />
+
+            {/* Template selector */}
+            <div className="mb-4">
+              <h3 className="text-sm font-semibold tracking-wide text-slate-800 uppercase">Template</h3>
+              <p className="text-xs text-slate-500 mt-1">Choose a layout preset for your invoice</p>
+            </div>
+            <div className="grid sm:grid-cols-4 gap-3 items-end">
+              <div className="grid gap-1.5">
+                <label className="text-xs text-slate-600">Template</label>
+                <select
+                  className="rounded-lg border border-black/10 bg-white px-2.5 py-2 text-sm"
+                  value={template}
+                  onChange={(e)=>setTemplate(e.target.value as 'Freelance' | 'Construction' | 'IT Services' | 'Consulting')}
+                >
+                  <option value="Freelance">Freelance</option>
+                  <option value="Construction">Construction</option>
+                  <option value="IT Services">IT Services</option>
+                  <option value="Consulting">Consulting</option>
                 </select>
               </div>
             </div>
