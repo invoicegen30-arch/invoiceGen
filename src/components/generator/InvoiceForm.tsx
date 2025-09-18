@@ -10,6 +10,7 @@ import { Item, TaxMode } from '@/types/invoice';
 import { motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import InvoicePaper from './InvoicePaper';
+import InvoiceConstructionA4 from '@/components/pdf/InvoiceConstructionA4';
 
 interface InvoiceFormProps {
   signedIn: boolean;
@@ -862,21 +863,39 @@ const sendEmail = async () => {
               <h3 className="text-sm font-semibold tracking-wide text-slate-800 uppercase">Preview</h3>
               <p className="text-xs text-slate-500 mt-1">A4 layout</p>
             </div>
-            <InvoicePaper
-              currency={currency}
-              zeroNote={zeroNote}
-              logoUrl={logo || undefined}
-              items={items}
-              subtotal={subtotal}
-              taxTotal={taxTotal}
-              total={total}
-              sender={sender}
-              client={client}
-              invoiceNo={invoiceMeta.number}
-              invoiceDate={invoiceMeta.date}
-              invoiceDue={invoiceMeta.due}
-              notes={notes}
-            />
+            {template === 'Construction' ? (
+              <InvoiceConstructionA4
+                currency={currency}
+                zeroNote={zeroNote}
+                logoUrl={logo || undefined}
+                items={items}
+                subtotal={subtotal}
+                taxTotal={taxTotal}
+                total={total}
+                sender={sender}
+                client={client}
+                invoiceNo={invoiceMeta.number}
+                invoiceDate={invoiceMeta.date}
+                invoiceDue={invoiceMeta.due}
+                notes={notes}
+              />
+            ) : (
+              <InvoicePaper
+                currency={currency}
+                zeroNote={zeroNote}
+                logoUrl={logo || undefined}
+                items={items}
+                subtotal={subtotal}
+                taxTotal={taxTotal}
+                total={total}
+                sender={sender}
+                client={client}
+                invoiceNo={invoiceMeta.number}
+                invoiceDate={invoiceMeta.date}
+                invoiceDue={invoiceMeta.due}
+                notes={notes}
+              />
+            )}
             <div className="mt-3 text-[11px] text-slate-500">
               Totals (auto): Subtotal <b>
                 {currency} {subtotal.toFixed(2)}
@@ -893,36 +912,69 @@ const sendEmail = async () => {
       </div>
 
       {/* Print-only A4 template (isolated on print) */}
-      <InvoiceA4
-        currency={currency}
-        zeroNote={zeroNote}
-        logoUrl={logo || undefined}
-        items={items}
-        subtotal={subtotal}
-        taxTotal={taxTotal}
-        total={total}
-        sender={{
-          company: sender.company,
-          vat: sender.vat,
-          address: sender.address,
-          city: sender.city,
-          country: sender.country,
-          iban: sender.iban,
-          bankName: sender.bankName,
-          bic: sender.bic,
-        }}
-        client={{
-          name: client.name,
-          vat: client.vat,
-          address: client.address,
-          city: client.city,
-          country: client.country,
-        }}
-        invoiceNo={invoiceMeta.number}
-        invoiceDate={invoiceMeta.date}
-        invoiceDue={invoiceMeta.due}
-        notes={notes}
-      />
+      {template === 'Construction' ? (
+        <InvoiceConstructionA4
+          currency={currency}
+          zeroNote={zeroNote}
+          logoUrl={logo || undefined}
+          items={items}
+          subtotal={subtotal}
+          taxTotal={taxTotal}
+          total={total}
+          sender={{
+            company: sender.company,
+            vat: sender.vat,
+            address: sender.address,
+            city: sender.city,
+            country: sender.country,
+            iban: sender.iban,
+            bankName: sender.bankName,
+            bic: sender.bic,
+          }}
+          client={{
+            name: client.name,
+            vat: client.vat,
+            address: client.address,
+            city: client.city,
+            country: client.country,
+          }}
+          invoiceNo={invoiceMeta.number}
+          invoiceDate={invoiceMeta.date}
+          invoiceDue={invoiceMeta.due}
+          notes={notes}
+        />
+      ) : (
+        <InvoiceA4
+          currency={currency}
+          zeroNote={zeroNote}
+          logoUrl={logo || undefined}
+          items={items}
+          subtotal={subtotal}
+          taxTotal={taxTotal}
+          total={total}
+          sender={{
+            company: sender.company,
+            vat: sender.vat,
+            address: sender.address,
+            city: sender.city,
+            country: sender.country,
+            iban: sender.iban,
+            bankName: sender.bankName,
+            bic: sender.bic,
+          }}
+          client={{
+            name: client.name,
+            vat: client.vat,
+            address: client.address,
+            city: client.city,
+            country: client.country,
+          }}
+          invoiceNo={invoiceMeta.number}
+          invoiceDate={invoiceMeta.date}
+          invoiceDue={invoiceMeta.due}
+          notes={notes}
+        />
+      )}
     </div>
   );
 }
