@@ -82,9 +82,9 @@ export const TEMPLATE_CATEGORIES = [
 
 export const TEMPLATES: TemplateInfo[] = [
   { id: 'freelance', name: 'Freelance', status: 'available', badge: 'Available', cta: 'use' },
-  { id: 'construction', name: 'Construction', status: 'preview', badge: 'Coming soon', cta: 'waitlist' },
-  { id: 'it', name: 'IT Services', status: 'preview', badge: 'Coming soon', cta: 'waitlist' },
-  { id: 'consulting', name: 'Consulting', status: 'preview', badge: 'Coming soon', cta: 'waitlist' },
+  { id: 'construction', name: 'Construction', status: 'available', badge: 'Available', cta: 'use' },
+  { id: 'it', name: 'IT Services', status: 'available', badge: 'Available', cta: 'use' },
+  { id: 'consulting', name: 'Consulting', status: 'available', badge: 'Available', cta: 'use' },
 ];
 
 
