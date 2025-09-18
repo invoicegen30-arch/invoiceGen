@@ -13,6 +13,7 @@ import InvoicePaper from './InvoicePaper';
 import InvoiceConstructionA4 from '@/components/pdf/InvoiceConstructionA4';
 import InvoiceITServicesA4 from '@/components/pdf/InvoiceITServicesA4';
 import InvoiceConsultingA4 from '@/components/pdf/InvoiceConsultingA4';
+import TemplatePreview from '@/components/generator/TemplatePreview';
 
 interface InvoiceFormProps {
   signedIn: boolean;
@@ -630,6 +631,17 @@ const sendEmail = async () => {
           </select>
           <span className="font-medium ml-3">Invoice language:</span>
           <span className="px-2 py-1 rounded-lg border border-black/10 bg-white">EN</span>
+          <span className="font-medium ml-3">Template:</span>
+          <select
+            value={template}
+            onChange={(e)=>setTemplate(e.target.value as 'Freelance' | 'Construction' | 'IT Services' | 'Consulting')}
+            className="rounded-lg border border-black/10 bg-white px-2.5 py-2"
+          >
+            <option value="Freelance">Freelance</option>
+            <option value="Construction">Construction</option>
+            <option value="IT Services">IT Services</option>
+            <option value="Consulting">Consulting</option>
+          </select>
         </div>
         <div className="flex items-center gap-2">
           <Button onClick={saveDraft} disabled={gated || busy !== null} variant="secondary" size="sm">
@@ -736,28 +748,7 @@ const sendEmail = async () => {
 
             <hr className="my-4 border-black/10" />
 
-            {/* Template selector */}
-            <div className="mb-4">
-              <h3 className="text-sm font-semibold tracking-wide text-slate-800 uppercase">Template</h3>
-              <p className="text-xs text-slate-500 mt-1">Choose a layout preset for your invoice</p>
-            </div>
-            <div className="grid sm:grid-cols-4 gap-3 items-end">
-              <div className="grid gap-1.5">
-                <label className="text-xs text-slate-600">Template</label>
-                <select
-                  className="rounded-lg border border-black/10 bg-white px-2.5 py-2 text-sm"
-                  value={template}
-                  onChange={(e)=>setTemplate(e.target.value as 'Freelance' | 'Construction' | 'IT Services' | 'Consulting')}
-                >
-                  <option value="Freelance">Freelance</option>
-                  <option value="Construction">Construction</option>
-                  <option value="IT Services">IT Services</option>
-                  <option value="Consulting">Consulting</option>
-                </select>
-              </div>
-            </div>
-
-            <hr className="my-4 border-black/10" />
+            
 
             <div className="mb-4">
               <h3 className="text-sm font-semibold tracking-wide text-slate-800 uppercase">Sender</h3>
