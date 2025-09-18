@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from 'react';
 import InvoicePaper from './InvoicePaper';
 import InvoiceConstructionA4 from '@/components/pdf/InvoiceConstructionA4';
 import InvoiceITServicesA4 from '@/components/pdf/InvoiceITServicesA4';
+import InvoiceConsultingA4 from '@/components/pdf/InvoiceConsultingA4';
 
 interface InvoiceFormProps {
   signedIn: boolean;
@@ -896,6 +897,22 @@ const sendEmail = async () => {
                 invoiceDue={invoiceMeta.due}
                 notes={notes}
               />
+            ) : template === 'Consulting' ? (
+              <InvoiceConsultingA4
+                currency={currency}
+                zeroNote={zeroNote}
+                logoUrl={logo || undefined}
+                items={items}
+                subtotal={subtotal}
+                taxTotal={taxTotal}
+                total={total}
+                sender={sender}
+                client={client}
+                invoiceNo={invoiceMeta.number}
+                invoiceDate={invoiceMeta.date}
+                invoiceDue={invoiceMeta.due}
+                notes={notes}
+              />
             ) : (
               <InvoicePaper
                 currency={currency}
@@ -962,6 +979,37 @@ const sendEmail = async () => {
         />
       ) : template === 'IT Services' ? (
         <InvoiceITServicesA4
+          currency={currency}
+          zeroNote={zeroNote}
+          logoUrl={logo || undefined}
+          items={items}
+          subtotal={subtotal}
+          taxTotal={taxTotal}
+          total={total}
+          sender={{
+            company: sender.company,
+            vat: sender.vat,
+            address: sender.address,
+            city: sender.city,
+            country: sender.country,
+            iban: sender.iban,
+            bankName: sender.bankName,
+            bic: sender.bic,
+          }}
+          client={{
+            name: client.name,
+            vat: client.vat,
+            address: client.address,
+            city: client.city,
+            country: client.country,
+          }}
+          invoiceNo={invoiceMeta.number}
+          invoiceDate={invoiceMeta.date}
+          invoiceDue={invoiceMeta.due}
+          notes={notes}
+        />
+      ) : template === 'Consulting' ? (
+        <InvoiceConsultingA4
           currency={currency}
           zeroNote={zeroNote}
           logoUrl={logo || undefined}
