@@ -1,12 +1,12 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { useState } from 'react';
 import Section from '@/components/layout/Section';
+import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
-import Button from '@/components/ui/Button';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -43,7 +43,7 @@ export default function Contact() {
             <div>Reg: 15673179</div>
             <div>Address: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET</div>
             <div>Email: info@invoicerly.co.uk</div>
-            <div>Phone: +44 7822016497</div>
+            <div>Phone: +44 7537 103023</div>
           </div>
         </motion.div>
 

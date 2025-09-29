@@ -35,7 +35,7 @@ export default function ContactPage() {
                   <div className="flex items-center justify-between"><div>Support</div><a className="underline" href="mailto:info@invoicerly.co.uk">info@invoicerly.co.uk</a></div>
                   <div className="flex items-center justify-between"><div>Billing</div><a className="underline" href="mailto:info@invoicerly.co.uk">info@invoicerly.co.uk</a></div>
                   <div className="flex items-center justify-between"><div>Privacy (DPO)</div><a className="underline" href="mailto:info@invoicerly.co.uk">info@invoicerly.co.uk</a></div>
-                  <div className="flex items-center justify-between"><div>Phone</div><a className="underline" href="tel:+447822016497">+44 7822 016497</a></div>
+                  <div className="flex items-center justify-between"><div>Phone</div><a className="underline" href="tel:+447537103023">+44 7537 103023</a></div>
                 </div>
                 <div className="mt-4 text-xs text-slate-500">Hours: Mon-Fri, 09:00-18:00 (UK). Limited support on EU public holidays.</div>
               </Card>
