@@ -136,5 +136,5 @@ This project is licensed under the MIT License.
 
 ## Support
 
-For support, email info@shapeai.co.uk or create an issue in the repository.
+For support, email info@invoicerly.co.uk or create an issue in the repository.
 

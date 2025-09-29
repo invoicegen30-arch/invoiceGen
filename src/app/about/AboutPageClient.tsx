@@ -364,14 +364,14 @@ export default function AboutPageClient() {
 
           <Card className="p-8 max-w-2xl mx-auto">
             <div className="text-center">
-              <h3 className="font-semibold text-slate-900 mb-4">PREPARING BUSINESS LTD</h3>
+              <h3 className="font-semibold text-slate-900 mb-4">GET STUFFED LTD</h3>
               <div className="space-y-2 text-sm text-slate-600">
-                <p>Company Registration: [Registration Number]</p>
-                <p>VAT Number: [VAT Number]</p>
+                <p>Company number: 15673179</p>
                 <p>Registered Address:</p>
-                <p className="font-medium">Dept 6189, 43 Owston Road<br />
-                Carcroft, Doncaster<br />
-                UK, DN6 8DA</p>
+                <p className="font-medium">Flat 21 County Chambers<br />
+                1 Drapery<br />
+                Northampton<br />
+                United Kingdom, NN1 2ET</p>
                 <p className="pt-4">
                   <a href="mailto:info@invoicerly.co.uk" className="text-blue-600 hover:underline">
                     info@invoicerly.co.uk

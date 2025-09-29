@@ -24,7 +24,7 @@ Billing & tokens: top-up amounts, currency (GBP/EUR), token balance and ledger (
 
 Usage & device data: pages/actions, app settings, approximate location (from IP), device/browser info, crash/error logs.
 
-Support data: messages you send to info@mail.com, attachments you choose to share.
+Support data: messages you send to info@invoicerly.co.uk, attachments you choose to share.
 
 Cookies & similar tech: see Cookies below and our Cookie Policy.
 
@@ -58,7 +58,7 @@ We do not perform automated decision-making that produces legal or similarly sig
 • Withdraw consent (for things based on consent).
 • Complain to a supervisory authority: in the UK, the ICO; in the EEA, your local DPA.
 
-To exercise rights, email info@mail.com from your account email. We’ll respond within one month.` },
+To exercise rights, email info@invoicerly.co.uk from your account email. We’ll respond within one month.` },
   { id: 'security', title: 'Security', body: `We use technical and organizational measures including:
 
 • Encryption in transit (TLS) and at rest for core data.
@@ -91,10 +91,11 @@ We require processors to protect data, act only on our instructions, and sign ap
 • Marketing – only if you opt in.
 
 You can manage preferences in the app and via browser settings. For details, see our Cookie Policy.` },
-  { id: 'contact', title: 'Contact', body: `Data controller: PREPARING BUSINESS LTD
-Email: info@mail.com
+  { id: 'contact', title: 'Contact', body: `Data controller: GET STUFFED LTD
+Company number: 15673179
+Email: info@invoicerly.co.uk
 
-Postal: Dept 6189, 43 Owston Road, Carcroft, Doncaster, UK, DN6 8DA
+Postal: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET
 
 If you have questions or want to exercise your rights, email us. We reply within one business day.` },
 ];

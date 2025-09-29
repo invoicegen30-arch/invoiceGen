@@ -67,7 +67,8 @@ We review lifetimes periodically and minimise where feasible.` },
 
   { id: 'contact', title: 'Contact', body: `Questions or requests about this policy?
 
-Email: info@mail.com
+Email: info@invoicerly.co.uk
+Postal: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET
 
 We reply within one business day.` },
 ];

@@ -230,11 +230,12 @@ export default function InvoiceConsultingA4({
             </div>
           </div>
 
-          <div className="mt-auto pt-4 text-[11px] muted">{sender.company} · {client.email || 'info@mail.com'} · Page 1 of 1</div>
+          <div className="mt-auto pt-4 text-[11px] muted">{sender.company} · {client.email || 'info@invoicerly.co.uk'} · Page 1 of 1</div>
         </div>
       </div>
     </div>
   );
 }
+
 
 

@@ -127,7 +127,7 @@ export default function TemplateCCompactTradeWireframe() {
 
         {/* Footer */}
         <div className="mt-auto pt-4 text-[11px] text-slate-500">
-          Company legal line · info@mail.com · Page 1 of 1
+          GET STUFFED LTD · Company number 15673179 · Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET · info@invoicerly.co.uk · Page 1 of 1
         </div>
       </div>
     </PageFrame>

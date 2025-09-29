@@ -204,7 +204,7 @@ export default function InvoiceA4({
 
           <div className="cut" />
 
-          <div className="footer">Invoicerly · info@mail.com · This PDF is generated electronically and is valid without a signature.</div>
+          <div className="footer">Invoicerly · info@invoicerly.co.uk · This PDF is generated electronically and is valid without a signature.</div>
         </div>
       </div>
     </div>

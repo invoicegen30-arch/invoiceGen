@@ -28,7 +28,7 @@ const POLICIES: Policy[] = [
       { id: "retention", title: "Retention", body: "We keep data only as long as necessary for stated purposes." },
       { id: "sharing", title: "Sharing & Processors", body: "We use carefully selected subвЂ‘processors for core features." },
       { id: "cookies", title: "Cookies", body: "See Cookie Policy for details; manage preferences in app." },
-      { id: "contact", title: "Contact", body: "Email: info@mail.com. We reply within one business day." },
+      { id: "contact", title: "Contact", body: "GET STUFFED LTD (Company number 15673179)\nEmail: info@invoicerly.co.uk\nPostal: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET\nWe reply within one business day." },
     ],
   },
   {
@@ -42,7 +42,7 @@ const POLICIES: Policy[] = [
       { id: "cancellation", title: "Cancellation & Termination", body: "How to cancel and what happens to data." },
       { id: "liability", title: "Limitation of Liability", body: "The service is provided asвЂ‘is within lawful limits." },
       { id: "law", title: "Governing Law", body: "As per region (UK/EU) shown above." },
-      { id: "contact", title: "Contact", body: "Email: info@mail.com for any questions." },
+      { id: "contact", title: "Contact", body: "GET STUFFED LTD (Company number 15673179)\nEmail: info@invoicerly.co.uk\nPostal: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET\nWe respond within one business day." },
     ],
   },
   {
@@ -53,7 +53,7 @@ const POLICIES: Policy[] = [
       { id: "types", title: "Types of Cookies", body: "Strictly necessary, performance, functionality, targeting." },
       { id: "prefs", title: "Managing Preferences", body: "Change consent in app settings or browser controls." },
       { id: "duration", title: "Duration", body: "Session vs persistent lifetimes." },
-      { id: "contact", title: "Contact", body: "Email: info@mail.com." },
+      { id: "contact", title: "Contact", body: "Email: info@invoicerly.co.uk\nPostal: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET" },
     ],
   },
   {
@@ -64,7 +64,7 @@ const POLICIES: Policy[] = [
       { id: "trials", title: "Trials & Renewals", body: "Trials, autoвЂ‘renewal, and how to turn off renewal." },
       { id: "refunds", title: "Refunds", body: "When we refund and how long processing takes." },
       { id: "eu_rights", title: "EU/UK Consumer Rights", body: "Statutory rights and exceptions for digital services." },
-      { id: "contact", title: "Contact", body: "Email: info@mail.com." },
+      { id: "contact", title: "Contact", body: "Email: info@invoicerly.co.uk\nPostal: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET" },
     ],
   },
 ];
@@ -168,7 +168,7 @@ export default function PoliciesPage() {
                 <MetaRow label="Last updated" value={lastUpdated} />
                 <MetaRow label="Version" value={version} />
               </div>
-              <div className="mt-3 text-xs text-slate-600">Governing law: {lawText} вЂў Questions: <a className="underline" href="mailto:info@mail.com">info@mail.com</a></div>
+              <div className="mt-3 text-xs text-slate-600">Governing law: {lawText} вЂў Questions: <a className="underline" href="mailto:info@invoicerly.co.uk">info@invoicerly.co.uk</a> • GET STUFFED LTD (Company number 15673179)</div>
             </Card>
 
             <Card className="mt-6 p-6" ref={contentRef as any}>
@@ -184,7 +184,8 @@ export default function PoliciesPage() {
           <div>
             <Card className="p-6">
               <h3 className="text-base font-semibold">Need help?</h3>
-              <p className="text-slate-600 text-sm mt-1">Email <a className="underline" href="mailto:info@mail.com">info@mail.com</a> and weвЂ™ll get back to you.</p>
+              <p className="text-slate-600 text-sm mt-1">Email <a className="underline" href="mailto:info@invoicerly.co.uk">info@invoicerly.co.uk</a> and weвЂ™ll get back to you.
+GET STUFFED LTD · Company number 15673179 · Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET</p>
               <div className="mt-4 h-px bg-black/10"></div>
               <h4 className="text-sm font-medium mt-4">Change log</h4>
               <ul className="mt-2 text-sm text-slate-700 space-y-2">

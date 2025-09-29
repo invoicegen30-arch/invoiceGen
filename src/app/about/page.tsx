@@ -22,16 +22,21 @@ export default function AboutPage() {
             "@context": "https://schema.org",
             "@type": "Organization",
             "name": "Invoicerly",
-            "legalName": "PREPARING BUSINESS LTD",
+            "legalName": "GET STUFFED LTD",
+            "identifier": {
+              "@type": "PropertyValue",
+              "propertyID": "Company Number",
+              "value": "15673179"
+            },
             "url": "https://invoicerly.co.uk",
             "logo": "https://invoicerly.co.uk/logo.png",
             "description": "VAT-aware invoice generation service for UK and EU businesses with token-based pricing",
             "foundingDate": "2024",
             "address": {
               "@type": "PostalAddress",
-              "streetAddress": "Dept 6189, 43 Owston Road",
-              "addressLocality": "Carcroft, Doncaster",
-              "postalCode": "DN6 8DA",
+              "streetAddress": "Flat 21 County Chambers, 1 Drapery",
+              "addressLocality": "Northampton",
+              "postalCode": "NN1 2ET",
               "addressCountry": "GB"
             },
             "contactPoint": {

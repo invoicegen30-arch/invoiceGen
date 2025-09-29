@@ -171,7 +171,7 @@ export default function InvoiceITServicesA4({
               </div>
             </div>
 
-            <div className="mt-auto text-[11px] text-slate-500">{sender.company} · {client.email || 'info@mail.com'}</div>
+            <div className="mt-auto text-[11px] text-slate-500">{sender.company} · {client.email || 'info@invoicerly.co.uk'}</div>
           </div>
 
           {/* Right column (summary + payment) */}
@@ -200,5 +200,6 @@ export default function InvoiceITServicesA4({
     </div>
   );
 }
+
 
 

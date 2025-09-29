@@ -27,7 +27,7 @@ export default function PolicyPage({
   effectiveDate = '1 Sep 2025',
   lastUpdated = '2 Sep 2025',
   version = 'v1.0.0',
-  helpEmail = 'info@mail.com',
+  helpEmail = 'info@invoicerly.co.uk',
   showRegionToggle = true,
 }: PolicyPageProps) {
   const [region, setRegion] = useState<Region>('UK');

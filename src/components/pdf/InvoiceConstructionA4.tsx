@@ -188,12 +188,13 @@ export default function InvoiceConstructionA4({
 
           {/* Footer */}
           <div className="mt-6 pt-2 text-[11px] text-slate-500">
-            {sender.company} · {client.email || 'info@mail.com'} · Page 1 of 1
+            {sender.company} · {client.email || 'info@invoicerly.co.uk'} · Page 1 of 1
           </div>
         </div>
       </div>
     </div>
   );
 }
+
 
 

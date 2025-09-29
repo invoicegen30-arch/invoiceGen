@@ -59,7 +59,10 @@ You remain responsible for tax compliance and the accuracy of invoices you issue
 EU view: These Terms and any dispute are governed by the laws of your EU Member State (default: Republic of Ireland if unspecified), with local courts having jurisdiction.
 
 Mandatory consumer rights in your country remain unaffected.` },
-  { id: 'contact', title: 'Contact', body: `Email: info@mail.com
+  { id: 'contact', title: 'Contact', body: `GET STUFFED LTD (Company number 15673179)
+Email: info@invoicerly.co.uk
+
+Postal: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET
 
 We respond within one business day.` },
   { id: 'optional', title: 'Optional clauses', body: `Changes to Terms. We may update these Terms from time to time. If changes are material, we’ll give reasonable notice. Continued use after the effective date means acceptance.

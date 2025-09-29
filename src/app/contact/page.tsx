@@ -1,7 +1,7 @@
-import Section from '@/components/layout/Section';
-import Card from '@/components/ui/Card';
-import Pill from '@/components/policy/Pill';
 import ContactForm from '@/components/contact/ContactForm';
+import Section from '@/components/layout/Section';
+import Pill from '@/components/policy/Pill';
+import Card from '@/components/ui/Card';
 
 export const metadata = {
   title: 'Contact - Invoicerly',
@@ -45,8 +45,9 @@ export default function ContactPage() {
                 <div className="mt-3 grid gap-4 text-sm text-slate-700">
                   <div>
                     <div className="font-medium">United Kingdom (Primary)</div>
-                    <div>PREPARING BUSINESS LTD</div>
-                    <div>Dept 6189 43 Owston Road, Carcroft,<br/>Doncaster, UK, DN6 8DA</div>
+                    <div>GET STUFFED LTD</div>
+                    <div>Company number 15673179</div>
+                    <div>Flat 21 County Chambers, 1 Drapery,<br/>Northampton, United Kingdom, NN1 2ET</div>
                   </div>
                 </div>
                 <div className="mt-4 h-40 rounded-xl overflow-hidden border border-black/10">
@@ -56,7 +57,7 @@ export default function ContactPage() {
                     height="100%"
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                    src="https://www.google.com/maps?q=Dept%206189%2043%20Owston%20Road%2C%20Carcroft%2C%20Doncaster%2C%20UK%2C%20DN6%208DA&output=embed"
+                    src="https://www.google.com/maps?q=Flat%2021%20County%20Chambers%2C%201%20Drapery%2C%20Northampton%2C%20United%20Kingdom%2C%20NN1%202ET&output=embed"
                   />
                 </div>
               </Card>

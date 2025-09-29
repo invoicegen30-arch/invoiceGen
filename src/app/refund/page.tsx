@@ -21,7 +21,7 @@ All purchases are one-off top-ups. You can top up whenever you need; there is no
 • Partially used tokens: If some tokens were spent, refunds are generally not available for the used portion. We may, at our discretion or where required by law, refund the unused remainder after deducting any promotional or fraud-prevention adjustments.
 • Spent tokens: Tokens spent to generate invoices or use paid actions are non-refundable.` },
 
-  { id: 'request', title: 'How to request', body: `Email info@mail.com from your account email with:
+  { id: 'request', title: 'How to request', body: `Email info@invoicerly.co.uk from your account email with:
 
 • Top-up date and amount
 • Currency (GBP/EUR)
@@ -51,7 +51,8 @@ Your statutory rights remain unaffected.` },
 
   { id: 'contact', title: 'Contact', body: `Questions or refund requests:
 
-Email: info@mail.com
+Email: info@invoicerly.co.uk
+Postal: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET
 
 We reply within one business day.` },
 ];
