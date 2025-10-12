@@ -21,19 +21,27 @@ export default function Header() {
   const isTokenCalc = pathname === '/token-calculator';
   const isAbout = pathname === '/about';
   const isDashboard = pathname === '/dashboard';
-  const [currency, setCurrency] = useState<'GBP' | 'EUR'>(() => {
-    if (typeof window === 'undefined') return 'GBP';
-    try { return (localStorage.getItem('currency') as 'GBP'|'EUR') || 'GBP'; } catch { return 'GBP'; }
-  });
+  const [currency, setCurrency] = useState<'GBP' | 'EUR'>('GBP');
+  const [mounted, setMounted] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileHelpOpen, setMobileHelpOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const t = (session?.user as any)?.tokenBalance;
     if (typeof t === 'number') setTokens(t);
   }, [session]);
+
+  // Initialize currency from localStorage after mount to prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+    try {
+      const savedCurrency = localStorage.getItem('currency') as 'GBP'|'EUR';
+      if (savedCurrency && (savedCurrency === 'GBP' || savedCurrency === 'EUR')) {
+        setCurrency(savedCurrency);
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     try {
@@ -148,11 +156,13 @@ export default function Header() {
         
         <div className="hidden sm:flex items-center gap-3">
           <div className="hidden md:block">
-            <Segmented
-              options={[{ label: 'GBP', value: 'GBP' }, { label: 'EUR', value: 'EUR' }]}
-              value={currency}
-              onChange={(v)=>onCurrencyChange(v as 'GBP'|'EUR')}
-            />
+            {mounted && (
+              <Segmented
+                options={[{ label: 'GBP', value: 'GBP' }, { label: 'EUR', value: 'EUR' }]}
+                value={currency}
+                onChange={(v)=>onCurrencyChange(v as 'GBP'|'EUR')}
+              />
+            )}
           </div>
           {!signedIn ? (
             <>

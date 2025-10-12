@@ -7,12 +7,44 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { PRICING_PLANS } from '@/lib/data';
 import { THEME } from '@/lib/theme';
+import { calculateTokens, formatCurrency, convertFromGBP, type Currency } from '@/lib/currency';
+
+function money(n: number, currency: Currency) {
+  const locale = currency === 'GBP' ? 'en-GB' : 'en-IE';
+  return new Intl.NumberFormat(locale, { style: 'currency', currency, maximumFractionDigits: n % 1 === 0 ? 0 : 2 }).format(n);
+}
+
+function AnimatedPrice({ amountInGBP, currency }: { amountInGBP: number; currency: Currency }) {
+  const convertedAmount = convertFromGBP(amountInGBP, currency);
+  const [display, setDisplay] = useState(0);
+  
+  // Count-up animation (400ms)
+  useEffect(() => {
+    let raf: number;
+    const start = performance.now();
+    const duration = 400;
+    const animate = (t: number) => {
+      const p = Math.min(1, (t - start) / duration);
+      setDisplay(convertedAmount * p);
+      if (p < 1) raf = requestAnimationFrame(animate);
+    };
+    raf = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(raf);
+  }, [convertedAmount]);
+  
+  return (
+    <div className="text-3xl font-bold">
+      {money(display, currency)}
+      <span className="text-base font-normal text-slate-500">/one-time</span>
+    </div>
+  );
+}
 
 export default function Pricing() {
   const bcRef = useRef<BroadcastChannel | null>(null);
-  const [currency, setCurrency] = useState<'GBP'|'EUR'|'AUD'>(()=>{
+  const [currency, setCurrency] = useState<Currency>(()=>{
     if (typeof window === 'undefined') return 'GBP';
-    try { return (localStorage.getItem('currency') as 'GBP'|'EUR'|'AUD') || 'GBP'; } catch { return 'GBP'; }
+    try { return (localStorage.getItem('currency') as Currency) || 'GBP'; } catch { return 'GBP'; }
   });
 
   useEffect(()=>{
@@ -20,7 +52,7 @@ export default function Pricing() {
       bcRef.current = new BroadcastChannel('app-events');
       bcRef.current.onmessage = (ev: MessageEvent) => {
         const data: any = (ev as any)?.data || {};
-        if (data.type === 'currency-updated' && (data.currency === 'GBP' || data.currency === 'EUR' || data.currency === 'AUD')) {
+        if (data.type === 'currency-updated' && (data.currency === 'GBP' || data.currency === 'EUR')) {
           setCurrency(data.currency);
           try { localStorage.setItem('currency', data.currency); } catch {}
         }
@@ -30,9 +62,9 @@ export default function Pricing() {
   }, []);
 
   const formatPrice = (priceText: string) => {
-    const match = priceText.match(/([0-9]+(?:\.[0-9]+)?)/);
-    const amount = match ? match[1] : '0';
-    return `${currency} ${amount}`;
+    const amountInGBP = parseFloat(priceText);
+    const convertedAmount = convertFromGBP(amountInGBP, currency);
+    return formatCurrency(convertedAmount, currency);
   };
 
   return (
@@ -45,7 +77,7 @@ export default function Pricing() {
         viewport={{ once: true }}
       >
         <h2 className="text-2xl sm:text-3xl font-bold">Plans</h2>
-        <p className="mt-2 text-slate-600">Start free, upgrade when you're ready.</p>
+        <p className="mt-2 text-slate-600">Buy tokens when you need them — they never expire.</p>
       </motion.div>
 
       <div className="grid md:grid-cols-4 gap-6">
@@ -73,12 +105,11 @@ export default function Pricing() {
                     </motion.span>
                   )}
                 </div>
-                <div className="mt-3 text-3xl font-bold">
-                  {formatPrice(plan.price)}
-                  <span className="text-base font-normal text-slate-500">/one-time</span>
+                <div className="mt-3">
+                  <AnimatedPrice amountInGBP={parseFloat(plan.price)} currency={currency} />
                 </div>
-                {/* Tokens line (GBP baseline) */}
-                <TokensLine planName={plan.name} priceText={formatPrice(plan.price)} />
+                {/* Tokens line with currency conversion */}
+                <TokensLine planName={plan.name} priceText={plan.price} currency={currency} />
                 <ul className="mt-4 space-y-2 text-sm text-slate-700">
                   {plan.points.map((point, pointIndex) => (
                     <motion.li
@@ -117,29 +148,23 @@ export default function Pricing() {
   );
 }
 
-function TokensLine({ planName, priceText }: { planName: string; priceText: string }) {
-  const extract = () => {
-    const match = priceText.match(/([0-9]+(?:\.[0-9]+)?)/);
-    if (!match) return 0;
-    return parseFloat(match[1]);
-  };
-  const TOKENS_PER_UNIT = 100;
+function TokensLine({ planName, priceText, currency }: { planName: string; priceText: string; currency: Currency }) {
+  const amountInGBP = parseFloat(priceText); // priceText contains base GBP amount
   const TOKENS_PER_INVOICE = 10;
   let tokens = 0;
   if (planName.toLowerCase() === 'free') tokens = 0;
-  else tokens = Math.round(extract() * TOKENS_PER_UNIT);
+  else tokens = calculateTokens(amountInGBP, 'GBP'); // Always calculate from GBP base
   const invoices = Math.round(tokens / TOKENS_PER_INVOICE);
   return (
     <div className="mt-1 text-xs text-slate-600">≈ {tokens} tokens (~{invoices} invoices)</div>
   );
 }
 
-function CustomHomeCard({ currency }: { currency: 'GBP'|'EUR'|'AUD' }) {
-  const [price, setPrice] = useState<number>(5);
-  const min = 5;
-  const TOKENS_PER_UNIT = 100;
+function CustomHomeCard({ currency }: { currency: Currency }) {
+  const [price, setPrice] = useState<number>(0.01);
+  const min = 0.01;
   const TOKENS_PER_INVOICE = 10;
-  const tokens = Math.max(0, Math.round(price * TOKENS_PER_UNIT));
+  const tokens = Math.max(0, calculateTokens(price, currency));
   const invoices = Math.round(tokens / TOKENS_PER_INVOICE);
 
   const onChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -160,7 +185,7 @@ function CustomHomeCard({ currency }: { currency: 'GBP'|'EUR'|'AUD' }) {
           <input
             type="number"
             min={min}
-            step={1}
+            step={0.01}
             value={price}
             onChange={onChange}
             className="w-24 text-3xl font-bold bg-transparent border-b border-black/10 focus:outline-none focus:ring-0"
@@ -172,7 +197,7 @@ function CustomHomeCard({ currency }: { currency: 'GBP'|'EUR'|'AUD' }) {
         <ul className="mt-4 space-y-2 text-sm text-slate-700">
           <li>Top up your account</li>
           <li>No subscription — pay what you need</li>
-          <li>Min {currency} 5</li>
+          <li>Min {formatCurrency(0.01, currency)}</li>
         </ul>
       </div>
       <div className="mt-6">

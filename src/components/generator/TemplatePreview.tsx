@@ -8,7 +8,7 @@ type TemplatePreviewProps = {
 
 export default function TemplatePreview({ children }: TemplatePreviewProps) {
   return (
-    <div className="min-h-[320px] flex items-start justify-center" data-template-preview>
+    <div className="min-h-[320px] flex items-start justify-center" data-template-preview id="print-area">
       <div className="w-full overflow-x-auto">
         <div className="mx-auto">{children}</div>
       </div>
@@ -24,4 +24,5 @@ export default function TemplatePreview({ children }: TemplatePreviewProps) {
     </div>
   );
 }
+
 

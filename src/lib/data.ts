@@ -3,21 +3,21 @@ import { PricingPlan, Testimonial, Feature, TemplateInfo } from '@/types';
 export const PRICING_PLANS: PricingPlan[] = [
   {
     name: 'Beginner',
-    price: 'GBP 10',
+    price: '10', // Base price in GBP, will be converted dynamically
     points: ['Top up 1,000 tokens (~100 invoices)', 'No subscription', 'Draft/preview free'],
     cta: 'Buy tokens',
     popular: false,
   },
   {
     name: 'Pro',
-    price: 'GBP 50',
+    price: '50', // Base price in GBP, will be converted dynamically
     points: ['Top up 5,000 tokens (~500 invoices)', 'Templates & logo', 'Payment links', 'Read receipts'],
     cta: 'Buy tokens',
     popular: true,
   },
   {
     name: 'Business',
-    price: 'GBP 100',
+    price: '100', // Base price in GBP, will be converted dynamically
     points: ['Top up 10,000 tokens (~1,000 invoices)', 'Teams & roles', 'Integrations (Stripe/Wise)', 'API & webhooks'],
     cta: 'Buy tokens',
     popular: false,

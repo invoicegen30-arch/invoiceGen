@@ -3,101 +3,161 @@ import { PolicySection } from '@/types/policy';
 
 export const metadata = {
   title: 'Privacy Policy - Invoicerly',
-  description: 'How we collect, use, and protect personal data.',
+  description: 'Comprehensive privacy policy for Invoicerly services. Learn how we collect, process, and protect your personal data in compliance with UK GDPR.',
 };
 
 const sections: PolicySection[] = [
-  { id: 'intro', title: 'Introduction', body: `This policy explains how we collect, use, and protect personal data when you use Invoicerly (the “Service”). We built the product for UK & EU invoicing and keep data handling simple and transparent.
+  { 
+    id: 'introduction', 
+    title: '1. Introduction', 
+    body: `We value your privacy and are committed to handling personal data responsibly. This Privacy Policy explains what data we collect, why we process it, how long we retain it, who we share it with, and how you can exercise your rights in connection with the services provided at invoicerly.co.uk operated by GET STUFFED LTD (trading as Invoicerly), Company No. 15673179, registered office: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET ("Invoicerly", "we", "us", "our").
 
-We do not sell personal data. We only process it to provide and improve the Service.` },
-  { id: 'scope', title: 'Scope & Region', body: `This policy applies to users in the UK and EU/EEA.
-Where we transfer data between the UK and EEA or to other countries, we use appropriate safeguards (e.g., Standard Contractual Clauses and the UK Addendum).
+For questions or data requests, contact: info@invoicerly.co.uk or +44 7537 103023.
 
-The Service is not intended for children under 16.` },
-  { id: 'data', title: 'Data We Collect', body: `Account data: name, email, password hash, country, preferences.
+Who is the controller?
+• We act as controller for account, billing, support and website usage data.
+• We act as processor for Customer Content you input into the Service (e.g., invoice line items, your clients' names, addresses and email recipients) and process it on your instructions. A Data Processing Addendum (DPA) is available on request.` 
+  },
+  { 
+    id: 'data-collection', 
+    title: '2. What Personal Data We Collect', 
+    body: `We only collect data necessary to operate and improve the Service. Typical categories include:
 
-Company (seller) data: company name, VAT/registration numbers, address, IBAN/BIC, invoice numbering settings.
+Account & Identity — name, email address, password hash, role/team, company profile, billing/postal address.
 
-Customer (buyer) data you enter: client names, VAT/registration numbers, addresses, line items, notes, and PDFs you generate (“Customer Content”).
+Transactions — token top-ups, order references, invoice/receipt records, payment identifiers (we do not store full card details; payments are handled by our providers).
 
-Billing & tokens: top-up amounts, currency (GBP/EUR), token balance and ledger (no card numbers on our servers).
+Service Usage & Technical — IP address, device/browser type, access and event logs, timestamps, cookie IDs, error telemetry.
 
-Usage & device data: pages/actions, app settings, approximate location (from IP), device/browser info, crash/error logs.
+Customer Content — invoice data you provide (your business details, recipients' names/emails/addresses, line items, taxes, numbers), file metadata and generated PDF.
 
-Support data: messages you send to info@invoicerly.co.uk, attachments you choose to share.
+Email Delivery Metadata — recipient addresses you choose to send to, message IDs, delivery status (sent/bounced/open where available), timestamps.
 
-Cookies & similar tech: see Cookies below and our Cookie Policy.
+Support & Correspondence — messages, attachments, and case history.
 
-You can choose not to provide some data, but the Service may not work as expected.` },
-  { id: 'use', title: 'How We Use Data', body: `We process data to:
+Marketing Preferences — opt-in/opt-out status, communication history.
 
-• Provide the Service: create invoices/PDFs, store drafts, manage token balance, email/share invoices on your request.
-• Operate & secure: authentication, fraud/abuse prevention, rate limiting, backups, incident response.
-• Billing & compliance: process payments, keep accounting/tax records.
-• Improve the product: analytics, troubleshooting, feature development.
-• Communicate: service messages (e.g., receipts, invoice delivery status), product updates.
-• Legal reasons: handle claims, requests from authorities when lawfully required.
+We do not collect more information than required for the purposes below.` 
+  },
+  { 
+    id: 'legal-bases', 
+    title: '3. Why We Process Your Data and Legal Bases', 
+    body: `• Provide the Service (contract performance): create drafts, generate and store PDFs, send invoices by email, manage tokens and accounts, and communicate about service delivery.
 
-We don’t use Customer Content for advertising or model training.` },
-  { id: 'legal', title: 'Legal Bases (EU/UK)', body: `We rely on:
+• Payments & fraud prevention (legal obligation / legitimate interests): verify purchases, detect misuse, maintain accounting and tax records.
 
-• Contract – to provide the Service you requested.
-• Legitimate interests – to run, secure, and improve the Service (balanced against your rights).
-• Consent – for non-essential cookies/analytics and optional marketing (you can withdraw anytime).
-• Legal obligation – tax, accounting, and compliance record-keeping.
-• Vital interests – only in rare, safety-related situations.
+• Support, refunds, disputes (contract / legitimate interests).
 
-We do not perform automated decision-making that produces legal or similarly significant effects.` },
-  { id: 'rights', title: 'Your Rights', body: `Subject to regional laws, you can:
+• Improvements & security (legitimate interests): monitoring, debugging, analytics in aggregate or anonymised form, load balancing, access controls.
 
-• Access your data and get a copy.
-• Rectify inaccurate data.
-• Erase data (“right to be forgotten”) where applicable.
-• Object to or restrict certain processing.
-• Port data you provided to us.
-• Withdraw consent (for things based on consent).
-• Complain to a supervisory authority: in the UK, the ICO; in the EEA, your local DPA.
+• Marketing (consent): we send marketing messages only if you have opted in; you may withdraw consent at any time.
 
-To exercise rights, email info@invoicerly.co.uk from your account email. We’ll respond within one month.` },
-  { id: 'security', title: 'Security', body: `We use technical and organizational measures including:
+• Legal compliance (legal obligation): record-keeping, responding to lawful requests from authorities.
 
-• Encryption in transit (TLS) and at rest for core data.
-• Strict access controls, least-privilege, and audit logs.
-• Regular backups and disaster-recovery procedures.
-• Vulnerability management and incident response.
+Where we rely on legitimate interests, we balance them against your rights and expectations.` 
+  },
+  { 
+    id: 'sharing-transfers', 
+    title: '4. Sharing and International Transfers', 
+    body: `We share personal data with trusted service providers where necessary to operate the Service, for example:
 
-No method is 100% secure, but we work to keep risk low and respond quickly to issues.` },
-  { id: 'retention', title: 'Retention', body: `We keep data only as long as needed for the purposes above:
+• Payment processors and banks (billing, fraud checks).
 
-• Account & company settings: for your account lifetime; delete when you close your account.
-• Customer Content (invoices, clients, PDFs): until you delete it or your account is closed; some metadata may remain in backups for a limited time.
-• Billing & token ledger: retained to meet tax/accounting laws (typically 6 years in the UK; EU periods may vary).
-• Support emails/logs: for troubleshooting and audit, then deleted or anonymized.
+• Hosting and cloud platforms (application hosting, file storage/backups).
 
-When retention ends, we delete or anonymize data.` },
-  { id: 'sharing', title: 'Sharing & Processors', body: `We share data only with:
+• Email delivery and communications tools (sending invoices/notifications, logging delivery).
 
-• Service providers (processors): cloud hosting & storage, email delivery, analytics, logging/monitoring, customer support, and PDF generation.
-• Payment processors: e.g., Stripe for card payments and potentially Wise for settlements—card details are processed by the provider and never stored on our servers.
-• Professional advisors (legal/accounting) and authorities when required by law.
-• Business transfers: if we undergo a merger, acquisition, or asset sale, we’ll notify you and continue to protect your data.
+• Analytics, monitoring and error-tracking tools.
 
-We require processors to protect data, act only on our instructions, and sign appropriate data protection terms.` },
-  { id: 'cookies', title: 'Cookies', body: `We use:
+• Professional advisers (legal/accounting), as needed.
 
-• Strictly necessary cookies – sign-in, security, load balancing.
-• Preferences – your language/region, UI settings.
-• Analytics – understand usage and improve (consent-based in the EU/UK).
-• Marketing – only if you opt in.
+• Regulators, courts or law enforcement where required by law.
 
-You can manage preferences in the app and via browser settings. For details, see our Cookie Policy.` },
-  { id: 'contact', title: 'Contact', body: `Data controller: GET STUFFED LTD
+Some providers may be located outside the UK/EEA. We rely on UK adequacy regulations, the UK International Data Transfer Addendum (IDTA) and/or Standard Contractual Clauses (SCCs), plus supplementary measures as appropriate. We do not transfer data in a way that reduces protections under applicable law.` 
+  },
+  { 
+    id: 'cookies', 
+    title: '5. Cookies and Similar Technologies', 
+    body: `We use cookies and similar technologies for essential operations, security, analytics and (with your consent) marketing. Essential cookies are required for the platform to function. See our Cookies Policy for details and controls.` 
+  },
+  { 
+    id: 'retention', 
+    title: '6. Data Retention', 
+    body: `We retain data only as long as necessary for the stated purposes and legal obligations:
+
+• Orders, invoices and payment logs: minimum 24 months, up to 6 years for tax, accounting or disputes.
+
+• Account & support records: while your account is active and for a reasonable period thereafter for security, fraud prevention and record-keeping.
+
+• Customer Content (invoice drafts/PDFs): stored while you keep them in your workspace; temporary files created during generation may be deleted automatically after processing.
+
+• Email delivery metadata: retained for a limited period to evidence delivery and troubleshoot deliverability.
+
+• Marketing data: until you withdraw consent or we no longer have a lawful basis.
+
+When data is no longer required, we securely delete or anonymise it.` 
+  },
+  { 
+    id: 'responsibilities', 
+    title: '7. Your Responsibilities (Recipients\' Data)', 
+    body: `You are responsible for ensuring you have a lawful basis (e.g., contract or legitimate interests) to use and send personal data of your invoice recipients through the Service and for providing any required privacy information to those recipients.` 
+  },
+  { 
+    id: 'rights', 
+    title: '8. Your Rights', 
+    body: `Under UK data-protection law, you may:
+
+• Access your personal data;
+
+• Rectify inaccurate data;
+
+• Erase data in certain cases;
+
+• Restrict processing;
+
+• Object to processing based on legitimate interests or to direct marketing;
+
+• Port data you provided in a structured, commonly used format;
+
+• Withdraw consent where processing relies on consent.
+
+To exercise your rights, email info@invoicerly.co.uk. We may need to verify your identity. We respond within statutory time limits (normally one month) unless an extension or lawful refusal applies.` 
+  },
+  { 
+    id: 'security', 
+    title: '9. Security Measures', 
+    body: `We implement appropriate technical and organisational measures, including encryption in transit, hardened infrastructure, access controls, least-privilege permissions, secure backups, audit logging and staff awareness. No system is completely secure; if a breach occurs likely to affect your rights, we will notify you and the relevant regulator in accordance with law.` 
+  },
+  { 
+    id: 'children', 
+    title: '10. Children', 
+    body: `The Service is intended for users 18+. We do not knowingly collect personal data from children.` 
+  },
+  { 
+    id: 'automation', 
+    title: '11. Automated Decision-Making and Profiling', 
+    body: `We do not conduct automated decision-making that produces legal or similarly significant effects. Limited automation (e.g., analytics, spam/abuse detection) may be used to protect and improve the Service and does not override your rights.` 
+  },
+  { 
+    id: 'changes', 
+    title: '12. Changes to this Policy', 
+    body: `We may revise this Privacy Policy from time to time. Material changes will be communicated via email or a prominent notice on our website. The updated Policy will display a new effective date.` 
+  },
+  { 
+    id: 'contact', 
+    title: '13. Contact & Complaints', 
+    body: `Controller: GET STUFFED LTD (trading as Invoicerly)
+Email: info@invoicerly.co.uk | Tel: +44 7537 103023
+Address: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET` 
+  },
+  { 
+    id: 'company-details', 
+    title: 'Company Details', 
+    body: `GET STUFFED LTD (trading as Invoicerly)
 Company number: 15673179
-Email: info@invoicerly.co.uk
-
-Postal: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET
-
-If you have questions or want to exercise your rights, email us. We reply within one business day.` },
+Registered office: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET
+Email: info@invoicerly.co.uk | Tel: +44 7537 103023` 
+  },
 ];
 
 export default function PrivacyPage() {

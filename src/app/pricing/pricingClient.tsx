@@ -12,7 +12,8 @@ import Pill from '@/components/policy/Pill';
 import Button from '@/components/ui/Button';
 import Segmented from '@/components/ui/Segmented';
 import { CC, VAT_RATES } from '@/lib/constants';
-import { Currency, pricingPlans } from '@/lib/plans';
+import { pricingPlans } from '@/lib/plans';
+import { calculateTokens, formatCurrency, type Currency } from '@/lib/currency';
 
 const COUNTRIES = Object.keys(CC);
 
@@ -242,13 +243,12 @@ export default function PricingClient() {
 }
 
 function CustomPlanCard({ currency, onPurchase }: { currency: Currency; onPurchase: (amount: number, currency: Currency) => void; }) {
-  const [priceInput, setPriceInput] = useState<string>('5');
-  const TOKENS_PER_UNIT = 100;
+  const [priceInput, setPriceInput] = useState<string>('0.01');
   const TOKENS_PER_INVOICE = 10;
-  const min = 5;
+  const min = 0.01;
   const numericPrice = parseFloat(priceInput || '0');
   const validNumber = Number.isFinite(numericPrice);
-  const tokens = Math.max(0, Math.round((validNumber ? numericPrice : 0) * TOKENS_PER_UNIT));
+  const tokens = Math.max(0, calculateTokens(validNumber ? numericPrice : 0, currency));
   const invoices = Math.round(tokens / TOKENS_PER_INVOICE);
 
   const onChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -264,19 +264,19 @@ function CustomPlanCard({ currency, onPurchase }: { currency: Currency; onPurcha
       </div>
       <div className="mt-3 flex items-center gap-2">
         <span className="text-3xl font-bold">{currency === 'GBP' ? '£' : '€'}</span>
-        <input type="number" step="any" value={priceInput}
+        <input type="number" step="0.01" value={priceInput}
           onChange={onChange}
           className="w-24 text-3xl font-bold bg-transparent border-b border-black/10 focus:outline-none focus:ring-0" aria-label="Custom price" />
         <span className="text-base font-normal text-slate-500">/one-time</span>
       </div>
       {(!validNumber || numericPrice < min) && (
-        <div className="mt-1 text-[11px] text-red-600">Minimum amount is {currency === 'GBP' ? '£' : '€'}5.00</div>
+        <div className="mt-1 text-[11px] text-red-600">Minimum amount is {formatCurrency(0.01, currency)}</div>
       )}
       <div className="mt-1 text-xs text-slate-600">= {tokens} tokens (~{invoices} invoices)</div>
       <ul className="mt-4 space-y-2 text-sm text-slate-700 list-disc pl-5">
         <li>Top up your account</li>
         <li>No subscription — pay what you need</li>
-        <li>Min {currency === 'GBP' ? '£5' : '€5'}</li>
+        <li>Min {formatCurrency(0.01, currency)}</li>
       </ul>
       <div className="mt-6">
         <Button className="w-full" size="lg" onClick={() => onPurchase(numericPrice, currency)} disabled={!validNumber || numericPrice < min}>

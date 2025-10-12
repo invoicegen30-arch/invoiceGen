@@ -2,15 +2,12 @@
 
 import { motion, useReducedMotion } from 'framer-motion';
 import Section from '@/components/layout/Section';
-import TodoPanel from '@/components/dev/TodoPanel';
-import { TRUSTED_BY_TODOS } from '@/lib/todos';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { BRANDS } from '@/lib/brands';
 import Link from 'next/link';
 
 export default function TrustedBy() {
-  const [showTodos, setShowTodos] = useState(process.env.NODE_ENV !== 'production');
   const reduce = useReducedMotion();
 
   // Deterministic initial order for SSR + first client render
@@ -21,11 +18,6 @@ export default function TrustedBy() {
 
   // Only on client after mount: shuffle non-featured to vary order without hydration mismatch
   useEffect(() => {
-    try {
-      const sp = new URLSearchParams(window.location.search);
-      if (sp.get('todos') === '1') setShowTodos(true);
-    } catch {}
-
     // Shuffle copy of the non-featured brands on client only
     const rest = BRANDS.filter(b => b.tier !== 'featured' && b.consent !== false).slice();
     for (let i = rest.length - 1; i > 0; i--) {
@@ -45,11 +37,8 @@ export default function TrustedBy() {
         viewport={{ once: true }}
       >
         <h2 className="text-2xl font-bold">Trusted by</h2>
-        <p className="mt-2 text-slate-600">We'll add real brands after launch.</p>
+        <p className="mt-2 text-slate-600">Practical tools for agencies, IT services, construction, and more.</p>
       </motion.div>
-      {showTodos && (
-        <TodoPanel items={TRUSTED_BY_TODOS} />
-      )}
 
       {/* Desktop grid 2x6 */}
       <div className="hidden sm:grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">

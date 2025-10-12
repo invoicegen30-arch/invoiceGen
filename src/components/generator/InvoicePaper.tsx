@@ -40,12 +40,10 @@ export default function InvoicePaper({
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
-      whileHover={{ scale: 1.02 }}
     >
       <div className="flex items-start justify-between">
         <motion.div
           className="h-10 w-10 rounded-lg bg-slate-200 overflow-hidden flex items-center justify-center"
-          whileHover={{ rotate: logoUrl ? 0 : 5 }}
           transition={{ type: 'spring', stiffness: 400, damping: 17 }}
         >
           {logoUrl ? (

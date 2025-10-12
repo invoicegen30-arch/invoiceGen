@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button';
 import { PaperPatternBG } from '@/components/graphics/Patterns';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import TemplatePreview from './TemplatePreview';
 
 export default function TemplatesGallery() {
   const reduce = useReducedMotion();
@@ -144,37 +145,44 @@ function TemplateCard({ tpl, index, reduce, onWaitlist }: { tpl: { id: string; n
       aria-label={`${tpl.name} — ${tpl.status === 'available' ? 'Available now' : 'Preview only'}. ${tpl.status === 'available' ? 'Use this template' : 'Join waitlist'}.`}
       onKeyDown={onKeyDown}
     >
-      {/* Placeholder with shimmer & pattern */}
-      <div className="relative h-28 rounded-lg bg-slate-100 border border-black/5 mb-3 overflow-hidden">
+      {/* Template Preview */}
+      <div className="relative h-28 rounded-lg bg-slate-100 border border-black/5 mb-3 overflow-hidden flex items-center justify-center">
         <PaperPatternBG className="text-slate-900" />
         {/* Shimmer stripe */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="hidden group-hover:block absolute -inset-y-10 -left-1/2 h-40 w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent animate-shimmer" />
         </div>
-        {/* Mini page flip for available template */}
+        {/* Real template preview */}
+        <div className="absolute inset-2 z-10">
+          <TemplatePreview 
+            template={tpl.name as 'Freelance' | 'Construction' | 'IT Services' | 'Consulting'} 
+            className="h-full"
+          />
+        </div>
+        {/* Mini page flip animation for available template */}
         {tpl.status === 'available' && (
-          <div className="absolute inset-2 grid grid-cols-2 gap-1">
+          <div className="absolute inset-2 grid grid-cols-2 gap-1 pointer-events-none">
             <motion.div
               key={pageFlip}
-              className="col-span-1 rounded bg-white border border-black/10"
-              initial={!!reduce ? {} : { opacity: 0.6, x: -6 }}
-              animate={!!reduce ? {} : { opacity: 1, x: 0 }}
+              className="col-span-1 rounded bg-white/20 border border-white/30"
+              initial={!!reduce ? {} : { opacity: 0.3, x: -2 }}
+              animate={!!reduce ? {} : { opacity: 0.6, x: 0 }}
               transition={{ duration: 0.2 }}
             />
             <motion.div
               key={`p${pageFlip}`}
-              className="col-span-1 rounded bg-white border border-black/10"
-              initial={!!reduce ? {} : { opacity: 0.6, x: 6 }}
-              animate={!!reduce ? {} : { opacity: 1, x: 0 }}
+              className="col-span-1 rounded bg-white/20 border border-white/30"
+              initial={!!reduce ? {} : { opacity: 0.3, x: 2 }}
+              animate={!!reduce ? {} : { opacity: 0.6, x: 0 }}
               transition={{ duration: 0.2 }}
             />
           </div>
         )}
       </div>
 
-      {/* Badge in corner */}
+      {/* Badge in corner - positioned over template preview */}
       {tpl.badge && (
-        <span className="absolute top-2 right-2 text-[10px] rounded-full px-2 py-1 bg-slate-900 text-white">
+        <span className="absolute top-2 right-2 text-[10px] rounded-full px-2 py-1 bg-slate-900 text-white z-20">
           {tpl.badge}
         </span>
       )}

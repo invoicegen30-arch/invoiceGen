@@ -6,11 +6,31 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import Segmented from '@/components/ui/Segmented';
+import { calculateTokens, convertFromGBP, formatCurrency, type Currency } from '@/lib/currency';
 
-type Currency = 'GBP' | 'EUR' | 'AUD';
+// Safe number formatting that works consistently on server and client
+function formatNumber(num: number): string {
+  if (num >= 1000) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  }
+  return num.toString();
+}
 
-const MIN_AMOUNT = 5;
-const MAX_AMOUNT = 500;
+// Format currency with more precision for small amounts (like cost per invoice)
+function formatCurrencyPrecise(amount: number, currency: Currency): string {
+  const symbols = {
+    GBP: '£',
+    EUR: '€',
+  };
+  const symbol = symbols[currency] || currency;
+  
+  // Use 3 decimal places for amounts < 1, 2 decimal places for larger amounts
+  const decimals = amount < 1 ? 3 : 2;
+  return `${symbol}${amount.toFixed(decimals)}`;
+}
+
+const MIN_AMOUNT_GBP = 5; // Base amount in GBP
+const MAX_AMOUNT_GBP = 500; // Base amount in GBP
 
 const FAQ_ITEMS = [
   {
@@ -43,8 +63,12 @@ export default function TokenCalculatorPage() {
     }
   }, []);
 
-  // Calculate tokens and invoices
-  const tokens = amount * 100;
+  // Get min/max amounts in current currency
+  const minAmount = convertFromGBP(MIN_AMOUNT_GBP, currency);
+  const maxAmount = convertFromGBP(MAX_AMOUNT_GBP, currency);
+
+  // Calculate tokens and invoices using proper currency conversion
+  const tokens = calculateTokens(amount, currency);
   const calculatedInvoices = Math.floor(tokens / 10);
   const effectiveCostPerInvoice = amount / calculatedInvoices;
 
@@ -60,7 +84,7 @@ export default function TokenCalculatorPage() {
 
   const handleAmountChange = (value: string) => {
     const numValue = parseFloat(value) || 0;
-    const clampedValue = Math.max(MIN_AMOUNT, Math.min(MAX_AMOUNT, numValue));
+    const clampedValue = Math.max(minAmount, Math.min(maxAmount, numValue));
     
     setIsUpdatingFromAmount(true);
     setAmount(clampedValue);
@@ -90,7 +114,7 @@ export default function TokenCalculatorPage() {
     setInvoicesNeeded(newInvoices);
     
     // Update amount after invoices change
-    const newAmount = Math.max(MIN_AMOUNT, Math.min(MAX_AMOUNT, newInvoices * 0.1));
+    const newAmount = Math.max(minAmount, Math.min(maxAmount, newInvoices * 0.1));
     setAmount(Math.round(newAmount * 100) / 100);
     
     setTimeout(() => {
@@ -174,13 +198,13 @@ export default function TokenCalculatorPage() {
             {/* Amount Input */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-slate-700 mb-3">
-                Amount ({currency === 'GBP' ? '£' : '€'})
+                Amount ({currency})
               </label>
               <div className="space-y-3">
                 <Input
                   type="number"
-                  min={MIN_AMOUNT}
-                  max={MAX_AMOUNT}
+                  min={minAmount}
+                  max={maxAmount}
                   step="0.01"
                   value={amount}
                   onChange={(e) => handleAmountChange(e.target.value)}
@@ -188,16 +212,16 @@ export default function TokenCalculatorPage() {
                 />
                 <input
                   type="range"
-                  min={MIN_AMOUNT}
-                  max={MAX_AMOUNT}
+                  min={minAmount}
+                  max={maxAmount}
                   step="0.01"
                   value={amount}
                   onChange={(e) => handleAmountChange(e.target.value)}
                   className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer slider"
                 />
                 <div className="flex justify-between text-xs text-slate-500">
-                  <span>{currency === 'GBP' ? '£' : '€'}5</span>
-                  <span>{currency === 'GBP' ? '£' : '€'}500</span>
+                  <span>{formatCurrency(minAmount, currency)}</span>
+                  <span>{formatCurrency(maxAmount, currency)}</span>
                 </div>
               </div>
             </div>
@@ -220,18 +244,18 @@ export default function TokenCalculatorPage() {
             </div>
 
             {/* Edge Cases */}
-            {amount < MIN_AMOUNT && (
+            {amount < minAmount && (
               <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
                 <p className="text-sm text-amber-800">
-                  Minimum amount is {currency === 'GBP' ? '£' : '€'}{MIN_AMOUNT}
+                  Minimum amount is {formatCurrency(minAmount, currency)}
                 </p>
               </div>
             )}
 
-            {amount >= MAX_AMOUNT && (
+            {amount >= maxAmount && (
               <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  Need more than {currency === 'GBP' ? '£' : '€'}{MAX_AMOUNT}? 
+                  Need more than {formatCurrency(maxAmount, currency)}? 
                   <a href="/contact" className="ml-1 underline hover:no-underline">
                     Contact us for bank transfer
                   </a>
@@ -250,7 +274,7 @@ export default function TokenCalculatorPage() {
               <div className="flex justify-between items-center py-3 border-b border-slate-200">
                 <span className="text-slate-600">Tokens you'll get</span>
                 <span className="text-2xl font-bold text-slate-900">
-                  {tokens.toLocaleString()}
+                  {formatNumber(tokens)}
                 </span>
               </div>
               
@@ -264,7 +288,7 @@ export default function TokenCalculatorPage() {
               <div className="flex justify-between items-center py-3 border-b border-slate-200">
                 <span className="text-slate-600">Effective cost per invoice</span>
                 <span className="text-2xl font-bold text-emerald-600">
-                  {currency === 'GBP' ? '£' : '€'}{effectiveCostPerInvoice.toFixed(2)}
+                  {formatCurrencyPrecise(effectiveCostPerInvoice, currency)}
                 </span>
               </div>
             </div>
@@ -283,7 +307,7 @@ export default function TokenCalculatorPage() {
                 className="w-full"
                 onClick={handleTopUpClick}
               >
-                Top up {currency === 'GBP' ? '£' : '€'}{amount}
+                Top up {formatCurrency(amount, currency)}
               </Button>
               
               <div className="flex gap-3">
@@ -323,10 +347,10 @@ export default function TokenCalculatorPage() {
             />
             <ExampleCard
               currency="EUR"
-              amount={50}
+              amount={11.50}
               onSelect={() => {
                 setCurrency('EUR');
-                setAmount(50);
+                setAmount(11.50);
               }}
             />
           </div>
@@ -391,7 +415,7 @@ function ExampleCard({
   amount: number;
   onSelect: () => void;
 }) {
-  const tokens = amount * 100;
+  const tokens = calculateTokens(amount, currency);
   const invoices = Math.floor(tokens / 10);
   const costPerInvoice = amount / invoices;
 
@@ -402,13 +426,13 @@ function ExampleCard({
     >
       <div className="text-center">
         <div className="text-2xl font-bold text-slate-900 mb-2">
-          {currency === 'GBP' ? '£' : '€'}{amount}
+          {formatCurrency(amount, currency)}
         </div>
         <div className="text-sm text-slate-600 space-y-1">
-          <div>{tokens.toLocaleString()} tokens</div>
+          <div>{formatNumber(tokens)} tokens</div>
           <div>≈ {invoices} invoices</div>
           <div className="text-emerald-600 font-medium">
-            {currency === 'GBP' ? '£' : '€'}{costPerInvoice.toFixed(2)} per invoice
+            {formatCurrencyPrecise(costPerInvoice, currency)} per invoice
           </div>
         </div>
       </div>
