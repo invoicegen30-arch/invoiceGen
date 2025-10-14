@@ -104,7 +104,7 @@ export default function Header() {
   }, [mobileOpen, mounted]);
 
   return (
-    <motion.header 
+    <motion.header
       className="sticky top-0 z-40 backdrop-blur bg-white/80 border-b border-black/10"
       initial={{ y: -100 }}
       animate={{ y: 0 }}
@@ -122,7 +122,7 @@ export default function Header() {
               <span>Invoicerly</span>
             </motion.span>
           </Link>
-          
+
           <nav className="hidden sm:flex items-center gap-2 text-sm relative">
             <a href="/generator" className={`rounded-xl px-3 py-2 transition-colors ${isGenerator ? 'bg-black/5' : 'hover:bg-black/5'}`}>Invoice Generator</a>
             {signedIn && (
@@ -130,6 +130,7 @@ export default function Header() {
             )}
             <a href="/pricing" className={`rounded-xl px-3 py-2 transition-colors ${isPricing ? 'bg-black/5' : 'hover:bg-black/5'}`}>Top-Up</a>
             <a href="/token-calculator" className={`rounded-xl px-3 py-2 transition-colors ${isTokenCalc ? 'bg-black/5' : 'hover:bg-black/5'}`}>Token Calculator</a>
+            <a href="/my-orders" className={`rounded-xl px-3 py-2 transition-colors ${pathname === '/my-orders' ? 'bg-black/5' : 'hover:bg-black/5'}`}>Orders</a>
             <div className="relative">
               <button
                 className={`rounded-xl px-3 py-2 transition-colors flex items-center gap-2 ${helpOpen ? 'bg-black/5' : 'hover:bg-black/5'}`}
@@ -153,7 +154,7 @@ export default function Header() {
             <a href="/about" className={`rounded-xl px-3 py-2 transition-colors ${isAbout ? 'bg-black/5' : 'hover:bg-black/5'}`}>About</a>
           </nav>
         </div>
-        
+
         <div className="hidden sm:flex items-center gap-3">
           <div className="hidden md:block">
             {mounted && (
@@ -280,6 +281,8 @@ export default function Header() {
                     </AnimatePresence>
 
                     <Link href="/about" className={`mt-1 rounded-xl px-3 py-2 hover:bg-slate-50 ${isAbout ? 'bg-black/5' : ''}`} onClick={closeMobile}>About</Link>
+                    <Link href="/my-orders" className={`rounded-xl px-3 py-2 hover:bg-slate-50 ${pathname === '/my-orders' ? 'bg-black/5' : ''}`} onClick={closeMobile}>Orders</Link>
+
                   </nav>
 
                   <div className="mt-4">

@@ -99,6 +99,22 @@ model Company {
   updatedAt DateTime @updatedAt
 }
 
+model Order {
+  id              String   @id @default(cuid())
+  userEmail       String
+  amount          Float
+  currency        String
+  description     String?
+  tokens          Int?
+  orderSystemId   String?  @unique
+  orderMerchantId String?
+  status          String   @default("PROCESSING")
+  response        Json?
+  createdAt       DateTime @default(now())
+}
+
+
+
 model Invoice {
   id        String   @id @default(cuid())
   userId    String
