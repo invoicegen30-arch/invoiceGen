@@ -8,21 +8,17 @@ export async function POST(req: Request) {
     console.log("📩 CardServ Webhook received:", body);
 
     const orderMerchantId = body.orderMerchantId || body.order?.orderMerchantId;
-    const orderSystemId = body.orderSystemId || body.order?.orderSystemId;
-
-    if (!orderMerchantId && !orderSystemId) {
-      console.error("❌ Webhook missing order IDs:", body);
-      return NextResponse.json(
-        { ok: false, error: "orderMerchantId or orderSystemId missing" },
-        { status: 400 }
-      );
+    if (!orderMerchantId) {
+      console.error("❌ Webhook missing orderMerchantId");
+      return NextResponse.json({ ok: false }, { status: 400 });
     }
 
-    // 🔹 Отримуємо оновлений статус з CardServ
+    // 🔹 Отримуємо актуальний статус
     const statusData = await getCardServStatus(orderMerchantId);
+    console.log("🔹 Webhook statusData:", statusData.orderState);
 
-    // 🔹 Оновлюємо статус ордеру в базі
-    await db.order.updateMany({
+    // 🔹 Оновлюємо статус у базі
+    const order = await db.order.updateMany({
       where: { orderMerchantId },
       data: {
         status: statusData.orderState,
@@ -30,19 +26,51 @@ export async function POST(req: Request) {
       },
     });
 
-    console.log("✅ Order updated:", orderMerchantId, statusData.orderState);
+    // 🔹 Якщо оплата успішна — нараховуємо токени
+    if (statusData.orderState === "APPROVED") {
+      const dbOrder = await db.order.findFirst({
+        where: { orderMerchantId },
+      });
+
+      if (!dbOrder) {
+        console.warn(`⚠️ Order ${orderMerchantId} not found in DB`);
+        return NextResponse.json({ ok: false }, { status: 404 });
+      }
+
+      const user = await db.user.findUnique({
+        where: { email: dbOrder.userEmail },
+      });
+
+      if (user && dbOrder.tokens) {
+        const newBalance = user.tokenBalance + dbOrder.tokens;
+
+        await db.user.update({
+          where: { id: user.id },
+          data: { tokenBalance: newBalance },
+        });
+
+        await db.ledgerEntry.create({
+          data: {
+            userId: user.id,
+            type: "Top-up",
+            delta: dbOrder.tokens,
+            balanceAfter: newBalance,
+            currency: user.currency,
+            amount: Math.round(dbOrder.amount * 100),
+          },
+        });
+
+        console.log(`✅ Tokens credited via Webhook: +${dbOrder.tokens} to ${user.email}`);
+      }
+    }
 
     return NextResponse.json({ ok: true, status: statusData.orderState });
   } catch (err: any) {
-    console.error("❌ CardServ webhook error:", err);
-    return NextResponse.json(
-      { ok: false, error: err.message },
-      { status: 500 }
-    );
+    console.error("❌ Webhook error:", err);
+    return NextResponse.json({ ok: false, error: err.message }, { status: 500 });
   }
 }
 
 export async function GET() {
-  // CardServ може робити health-check GET-запитом
   return NextResponse.json({ ok: true });
 }

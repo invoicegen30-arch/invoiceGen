@@ -8,10 +8,11 @@ import TrustedBy from '@/components/sections/TrustedBy';
 import Pricing from '@/components/sections/Pricing';
 import Testimonials from '@/components/sections/Testimonials';
 import Contact from '@/components/sections/Contact';
+import PricingClient from "@/app/pricing/pricingClient";
 
 export default function HomePage() {
   return (
-    <motion.div 
+    <motion.div
       className="bg-slate-50 min-h-screen"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -22,7 +23,7 @@ export default function HomePage() {
         <WhyUs />
         <TemplatesGallery />
         <TrustedBy />
-        <Pricing />
+        <PricingClient />
         <Testimonials />
         <Contact />
       </main>

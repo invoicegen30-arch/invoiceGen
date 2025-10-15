@@ -7,6 +7,10 @@ import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import Segmented from '@/components/ui/Segmented';
 import { calculateTokens, convertFromGBP, formatCurrency, type Currency } from '@/lib/currency';
+import {useSession} from "next-auth/react";
+import {useRouter} from "next/navigation";
+import { toast } from "sonner";
+
 
 // Safe number formatting that works consistently on server and client
 function formatNumber(num: number): string {
@@ -23,7 +27,7 @@ function formatCurrencyPrecise(amount: number, currency: Currency): string {
     EUR: '€',
   };
   const symbol = symbols[currency] || currency;
-  
+
   // Use 3 decimal places for amounts < 1, 2 decimal places for larger amounts
   const decimals = amount < 1 ? 3 : 2;
   return `${symbol}${amount.toFixed(decimals)}`;
@@ -53,7 +57,9 @@ export default function TokenCalculatorPage() {
   const [invoicesNeeded, setInvoicesNeeded] = useState(5);
   const [isUpdatingFromAmount, setIsUpdatingFromAmount] = useState(false);
   const [isUpdatingFromInvoices, setIsUpdatingFromInvoices] = useState(false);
-
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const signedIn = status === "authenticated";
   useEffect(() => {
     if (typeof window !== 'undefined') {
       // @ts-ignore
@@ -85,18 +91,18 @@ export default function TokenCalculatorPage() {
   const handleAmountChange = (value: string) => {
     const numValue = parseFloat(value) || 0;
     const clampedValue = Math.max(minAmount, Math.min(maxAmount, numValue));
-    
+
     setIsUpdatingFromAmount(true);
     setAmount(clampedValue);
-    
+
     // Update invoices after amount change
     const newInvoices = Math.floor(clampedValue * 100 / 10);
     setInvoicesNeeded(newInvoices);
-    
+
     setTimeout(() => {
       setIsUpdatingFromAmount(false);
     }, 0);
-    
+
     if (typeof window !== 'undefined') {
       // @ts-ignore
       window.gtag?.('event', 'calc_change_amount', {
@@ -109,14 +115,14 @@ export default function TokenCalculatorPage() {
   const handleInvoicesChange = (value: string) => {
     const numValue = parseInt(value) || 0;
     const newInvoices = Math.max(1, numValue);
-    
+
     setIsUpdatingFromInvoices(true);
     setInvoicesNeeded(newInvoices);
-    
+
     // Update amount after invoices change
     const newAmount = Math.max(minAmount, Math.min(maxAmount, newInvoices * 0.1));
     setAmount(Math.round(newAmount * 100) / 100);
-    
+
     setTimeout(() => {
       setIsUpdatingFromInvoices(false);
     }, 0);
@@ -125,7 +131,7 @@ export default function TokenCalculatorPage() {
   const handleCurrencyChange = (value: string) => {
     const newCurrency = value as Currency;
     setCurrency(newCurrency);
-    
+
     if (typeof window !== 'undefined') {
       // @ts-ignore
       window.gtag?.('event', 'calc_change_currency', {
@@ -135,20 +141,35 @@ export default function TokenCalculatorPage() {
   };
 
   const handleTopUpClick = () => {
-    if (typeof window !== 'undefined') {
-      // @ts-ignore
-      window.gtag?.('event', 'calc_topup_click', {
-        amount: amount,
-        currency: currency,
-        tokens: tokens,
-      });
+    if (!signedIn) {
+      toast.warning("Please sign in to continue");
+      return router.push("/auth/signin?mode=login");
+    }
+
+    try {
+      // Зберігаємо дані для сторінки /checkout
+      const checkoutData = {
+        amount,
+        currency,
+        description: `Top-up ${amount} ${currency}`,
+        tokens,
+        email: session?.user?.email || "guest@example.com",
+      };
+
+      localStorage.setItem("checkoutData", JSON.stringify(checkoutData));
+
+      // Перенаправлення на сторінку checkout
+      router.push("/checkout");
+    } catch (err) {
+      console.error("Checkout redirect error:", err);
+      toast.error("Something went wrong. Please try again.");
     }
   };
 
   const handleCopyLink = () => {
     const url = `${window.location.origin}/token-calculator?amount=${amount}&currency=${currency}`;
     navigator.clipboard.writeText(url);
-    
+
     if (typeof window !== 'undefined') {
       // @ts-ignore
       window.gtag?.('event', 'calc_copy_link', {
@@ -179,7 +200,7 @@ export default function TokenCalculatorPage() {
             <h2 className="text-xl font-semibold text-slate-900 mb-6">
               Calculate Tokens
             </h2>
-            
+
             {/* Currency Toggle */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-slate-700 mb-3">
@@ -255,7 +276,7 @@ export default function TokenCalculatorPage() {
             {amount >= maxAmount && (
               <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  Need more than {formatCurrency(maxAmount, currency)}? 
+                  Need more than {formatCurrency(maxAmount, currency)}?
                   <a href="/contact" className="ml-1 underline hover:no-underline">
                     Contact us for bank transfer
                   </a>
@@ -269,7 +290,7 @@ export default function TokenCalculatorPage() {
             <h2 className="text-xl font-semibold text-slate-900 mb-6">
               Results
             </h2>
-            
+
             <div className="space-y-4 mb-6">
               <div className="flex justify-between items-center py-3 border-b border-slate-200">
                 <span className="text-slate-600">Tokens you'll get</span>
@@ -277,14 +298,14 @@ export default function TokenCalculatorPage() {
                   {formatNumber(tokens)}
                 </span>
               </div>
-              
+
               <div className="flex justify-between items-center py-3 border-b border-slate-200">
                 <span className="text-slate-600">≈ Invoices</span>
                 <span className="text-2xl font-bold text-slate-900">
                   {calculatedInvoices}
                 </span>
               </div>
-              
+
               <div className="flex justify-between items-center py-3 border-b border-slate-200">
                 <span className="text-slate-600">Effective cost per invoice</span>
                 <span className="text-2xl font-bold text-emerald-600">
@@ -309,7 +330,7 @@ export default function TokenCalculatorPage() {
               >
                 Top up {formatCurrency(amount, currency)}
               </Button>
-              
+
               <div className="flex gap-3">
                 <Button
                   href="/generator"
@@ -318,7 +339,7 @@ export default function TokenCalculatorPage() {
                 >
                   Open Generator
                 </Button>
-                
+
                 <Button
                   onClick={handleCopyLink}
                   variant="outline"
@@ -392,7 +413,7 @@ export default function TokenCalculatorPage() {
           background: #3b82f6;
           cursor: pointer;
         }
-        
+
         .slider::-moz-range-thumb {
           height: 20px;
           width: 20px;
@@ -420,7 +441,7 @@ function ExampleCard({
   const costPerInvoice = amount / invoices;
 
   return (
-    <div 
+    <div
       className="p-4 cursor-pointer hover:bg-slate-50 transition-colors bg-white rounded-lg border border-slate-200 shadow-sm"
       onClick={onSelect}
     >
