@@ -13,6 +13,8 @@ type Order = {
   description?: string;
   status: string;
   createdAt: string;
+  orderSystemId?: number | null;
+  orderMerchantId?: string | null;
 };
 
 export default function MyOrdersPage() {
@@ -89,6 +91,19 @@ export default function MyOrdersPage() {
                     <p className="text-sm text-slate-500">
                       {format(new Date(order.createdAt), "dd MMM yyyy, HH:mm")}
                     </p>
+
+                    {/* 🔹 Order IDs */}
+                    <div className="mt-2 text-xs text-slate-500 space-y-1">
+
+                      {order.orderSystemId && (
+                        <p>
+                          <span className="font-semibold text-slate-600">
+                            Order ID:
+                          </span>{" "}
+                          {order.orderSystemId}
+                        </p>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex flex-col md:flex-row md:items-center gap-3">

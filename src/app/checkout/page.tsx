@@ -66,28 +66,47 @@ export default function CheckoutPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      if (!res.ok) throw new Error(data.error || "Payment creation failed");
 
+      // 🔁 Якщо є redirect URL → одразу редиректимо на 3DS
+      if (data?.data?.redirectUrl) {
+        window.location.href = data.data.redirectUrl;
+        return;
+      }
+
+      // 🔁 Якщо redirect URL ще не згенерований → чекаємо
+      let redirectUrl = null;
+      let attempts = 0;
+
+      while (!redirectUrl && attempts < 5) {
+        await new Promise((resolve) => setTimeout(resolve, 2000)); // чекати 2 сек
+        const check = await fetch("/api/cardserv/status", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderMerchantId: data.data.orderMerchantId }),
+        });
+        const status = await check.json();
+        redirectUrl = status.data?.redirectUrl;
+        attempts++;
+      }
+
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+        return;
+      }
+
+      // Якщо навіть після кількох спроб redirect не з’явився
       toast.success("Order created successfully!");
       setSuccess(true);
-
-      // 🎉 Confetti burst
-      confetti({
-        particleCount: 150,
-        spread: 80,
-        origin: { y: 0.6 },
-      });
-
-      // Redirect after short delay
-      setTimeout(() => {
-        router.push("/my-orders");
-      }, 4000);
+      confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+      setTimeout(() => router.push("/my-orders"), 4000);
     } catch (err: any) {
       toast.error(err.message || "Payment failed");
     } finally {
       setSubmitting(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-12 px-4 sm:px-6 lg:px-8">

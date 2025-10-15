@@ -1,32 +1,48 @@
-// TypeScript
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { db } from '@/lib/db';
+import { NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { getCardServStatus } from "@/lib/cardserv";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     const body = await req.json();
-    // adapt to the actual structure your gateway sends
-    const orderSystemId = body?.order?.orderSystemId ?? body?.orderSystemId ?? body?.orderId;
+    console.log("📩 CardServ Webhook received:", body);
 
-    if (typeof orderSystemId !== 'string' || !orderSystemId.trim()) {
-      return NextResponse.json({ error: 'Invalid or missing orderSystemId' }, { status: 400 });
+    const orderMerchantId = body.orderMerchantId || body.order?.orderMerchantId;
+    const orderSystemId = body.orderSystemId || body.order?.orderSystemId;
+
+    if (!orderMerchantId && !orderSystemId) {
+      console.error("❌ Webhook missing order IDs:", body);
+      return NextResponse.json(
+        { ok: false, error: "orderMerchantId or orderSystemId missing" },
+        { status: 400 }
+      );
     }
 
-    // Use findFirst when the lookup field is not the Prisma unique `id`.
-    const order = await db.order.findFirst({ where: { orderSystemId } });
+    // 🔹 Отримуємо оновлений статус з CardServ
+    const statusData = await getCardServStatus(orderMerchantId);
 
-    if (!order) {
-      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
-    }
+    // 🔹 Оновлюємо статус ордеру в базі
+    await db.order.updateMany({
+      where: { orderMerchantId },
+      data: {
+        status: statusData.orderState,
+        response: statusData.raw,
+      },
+    });
 
-    // handle webhook event and update order as needed (example)
-    // const eventType = body?.event;
-    // if (eventType === 'PAYMENT.SUCCESS') { ... update order ... }
+    console.log("✅ Order updated:", orderMerchantId, statusData.orderState);
 
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error('CardServ webhook error:', err);
-    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    return NextResponse.json({ ok: true, status: statusData.orderState });
+  } catch (err: any) {
+    console.error("❌ CardServ webhook error:", err);
+    return NextResponse.json(
+      { ok: false, error: err.message },
+      { status: 500 }
+    );
   }
+}
+
+export async function GET() {
+  // CardServ може робити health-check GET-запитом
+  return NextResponse.json({ ok: true });
 }
