@@ -1,31 +1,37 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Section from '@/components/layout/Section';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { PRICING_PLANS } from '@/lib/data';
 import { THEME } from '@/lib/theme';
-import { calculateTokens, formatCurrency, convertFromGBP, type Currency } from '@/lib/currency';
+import { calculateTokens, formatCurrency, convertFromGBP, convertToGBP, type Currency } from '@/lib/currency';
 
 function money(n: number, currency: Currency) {
-  const locale = currency === 'GBP' ? 'en-GB' : 'en-IE';
+  const locale = currency === 'GBP' ? 'en-GB' : currency === 'EUR' ? 'en-IE' : 'en-US';
   return new Intl.NumberFormat(locale, { style: 'currency', currency, maximumFractionDigits: n % 1 === 0 ? 0 : 2 }).format(n);
 }
 
 function AnimatedPrice({ amountInGBP, currency }: { amountInGBP: number; currency: Currency }) {
-  const convertedAmount = convertFromGBP(amountInGBP, currency);
-  const [display, setDisplay] = useState(0);
+  const convertedAmount = useMemo(() => convertFromGBP(amountInGBP, currency), [amountInGBP, currency]);
+  const [display, setDisplay] = useState(convertedAmount);
+  const displayRef = useRef(convertedAmount);
   
   // Count-up animation (400ms)
   useEffect(() => {
     let raf: number;
     const start = performance.now();
     const duration = 400;
+    const startValue = displayRef.current;
+    const endValue = convertedAmount;
+    
     const animate = (t: number) => {
       const p = Math.min(1, (t - start) / duration);
-      setDisplay(convertedAmount * p);
+      const currentValue = startValue + (endValue - startValue) * p;
+      setDisplay(currentValue);
+      displayRef.current = currentValue;
       if (p < 1) raf = requestAnimationFrame(animate);
     };
     raf = requestAnimationFrame(animate);
@@ -52,7 +58,7 @@ export default function Pricing() {
       bcRef.current = new BroadcastChannel('app-events');
       bcRef.current.onmessage = (ev: MessageEvent) => {
         const data: any = (ev as any)?.data || {};
-        if (data.type === 'currency-updated' && (data.currency === 'GBP' || data.currency === 'EUR')) {
+        if (data.type === 'currency-updated' && (data.currency === 'GBP' || data.currency === 'EUR' || data.currency === 'USD')) {
           setCurrency(data.currency);
           try { localStorage.setItem('currency', data.currency); } catch {}
         }
@@ -162,10 +168,21 @@ function TokensLine({ planName, priceText, currency }: { planName: string; price
 
 function CustomHomeCard({ currency }: { currency: Currency }) {
   const [price, setPrice] = useState<number>(0.01);
+  const [prevCurrency, setPrevCurrency] = useState<Currency>(currency);
   const min = 0.01;
   const TOKENS_PER_INVOICE = 10;
   const tokens = Math.max(0, calculateTokens(price, currency));
   const invoices = Math.round(tokens / TOKENS_PER_INVOICE);
+
+  // Update price when currency changes (convert from previous currency to new)
+  useEffect(() => {
+    if (prevCurrency !== currency) {
+      const gbpAmount = convertToGBP(price, prevCurrency);
+      const newPrice = convertFromGBP(gbpAmount, currency);
+      setPrice(Math.max(min, newPrice));
+      setPrevCurrency(currency);
+    }
+  }, [currency, prevCurrency, price, min]);
 
   const onChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const v = parseFloat(e.target.value || '0');

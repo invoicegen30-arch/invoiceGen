@@ -9,9 +9,12 @@ const TOKEN_PACKAGES = [
   { amount: 10, currency: 'GBP', tokens: 1000, invoices: 100, costPerInvoice: 0.10 },
   { amount: 50, currency: 'GBP', tokens: 5000, invoices: 500, costPerInvoice: 0.10 },
   { amount: 100, currency: 'GBP', tokens: 10000, invoices: 1000, costPerInvoice: 0.10 },
-  { amount: 10, currency: 'EUR', tokens: 1000, invoices: 100, costPerInvoice: 0.10 },
-  { amount: 50, currency: 'EUR', tokens: 5000, invoices: 500, costPerInvoice: 0.10 },
-  { amount: 100, currency: 'EUR', tokens: 10000, invoices: 1000, costPerInvoice: 0.10 },
+  { amount: 11.50, currency: 'EUR', tokens: 1000, invoices: 100, costPerInvoice: 0.115 },
+  { amount: 57.50, currency: 'EUR', tokens: 5000, invoices: 500, costPerInvoice: 0.115 },
+  { amount: 115, currency: 'EUR', tokens: 10000, invoices: 1000, costPerInvoice: 0.115 },
+  { amount: 13.30, currency: 'USD', tokens: 1000, invoices: 100, costPerInvoice: 0.133 },
+  { amount: 66.50, currency: 'USD', tokens: 5000, invoices: 500, costPerInvoice: 0.133 },
+  { amount: 133, currency: 'USD', tokens: 10000, invoices: 1000, costPerInvoice: 0.133 },
 ];
 
 const LEDGER_SAMPLE = [
@@ -24,7 +27,7 @@ const LEDGER_SAMPLE = [
 ];
 
 export default function BillingTokensPage() {
-  const [selectedCurrency, setSelectedCurrency] = useState<'GBP' | 'EUR' | 'AUD'>('GBP');
+  const [selectedCurrency, setSelectedCurrency] = useState<'GBP' | 'EUR' | 'USD'>('GBP');
   const [customAmount, setCustomAmount] = useState<number>(10);
 
   useEffect(() => {
@@ -118,11 +121,12 @@ export default function BillingTokensPage() {
                       />
                       <select
                         value={selectedCurrency}
-                        onChange={(e) => setSelectedCurrency(e.target.value as 'GBP' | 'EUR')}
+                        onChange={(e) => setSelectedCurrency(e.target.value as 'GBP' | 'EUR' | 'USD')}
                         className="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                       >
                         <option value="GBP">GBP</option>
                         <option value="EUR">EUR</option>
+                        <option value="USD">USD</option>
                       </select>
                     </div>
                   </div>

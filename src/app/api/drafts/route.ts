@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   const userId = (session.user as any).id as string;
 
   const body = await req.json().catch(() => ({}));
-  const currency = (body.currency as 'GBP' | 'EUR') || ((session.user as any).currency ?? 'GBP');
+  const currency = (body.currency as 'GBP' | 'EUR' | 'USD') || ((session.user as any).currency ?? 'GBP');
   const client = (body.client as string) || 'New Client';
   const toDec = (v: any) => typeof v === 'number' ? v.toFixed(2) : (Number(v||0)).toFixed(2);
   const subtotal = toDec(body.subtotal ?? 0);

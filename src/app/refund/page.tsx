@@ -7,9 +7,9 @@ import { formatCurrency, convertFromGBP, type Currency } from '@/lib/currency';
 
 // Function to generate dynamic sections based on currency
 function getRefundSections(currency: Currency): PolicySection[] {
-  const currencySymbol = currency === 'GBP' ? '£' : '€';
-  const tokenRate = currency === 'GBP' ? 100 : 100; // Both currencies: 100 tokens
-  const currencyAmount = currency === 'GBP' ? 1 : 1.15; // GBP: £1, EUR: €1.15
+  const currencySymbol = currency === 'GBP' ? '£' : currency === 'EUR' ? '€' : '$';
+  const tokenRate = currency === 'GBP' ? 100 : 100; // All currencies: 100 tokens
+  const currencyAmount = currency === 'GBP' ? 1 : currency === 'EUR' ? 1.15 : 1.33; // GBP: £1, EUR: €1.15, USD: $1.33
   const exampleAmount = convertFromGBP(20, currency); // £20 = €23
   const exampleTokens = 2000; // Always 2000 tokens for £20/€23
   
@@ -115,21 +115,26 @@ Company No.: 15673179`
 }
 
 function RefundPageClient() {
-  const [currency, setCurrency] = useState<Currency>(() => {
-    if (typeof window === 'undefined') return 'GBP';
+  const [currency, setCurrency] = useState<Currency>('GBP'); // Always start with GBP for SSR
+  const [mounted, setMounted] = useState(false);
+
+  // Initialize currency from localStorage after mounting (prevents hydration mismatch)
+  useEffect(() => {
+    setMounted(true);
     try {
-      return (localStorage.getItem('currency') as Currency) || 'GBP';
-    } catch {
-      return 'GBP';
-    }
-  });
+      const saved = localStorage.getItem('currency') as Currency;
+      if (saved && (saved === 'GBP' || saved === 'EUR' || saved === 'USD')) {
+        setCurrency(saved);
+      }
+    } catch {}
+  }, []);
 
   // Listen for currency changes from header using BroadcastChannel
   useEffect(() => {
     const bc = new BroadcastChannel('app-events');
     
     const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === 'currency-updated' && (event.data.currency === 'GBP' || event.data.currency === 'EUR')) {
+      if (event.data.type === 'currency-updated' && (event.data.currency === 'GBP' || event.data.currency === 'EUR' || event.data.currency === 'USD')) {
         setCurrency(event.data.currency);
       }
     };

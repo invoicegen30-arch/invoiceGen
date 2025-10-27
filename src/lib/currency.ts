@@ -5,6 +5,7 @@
 export const EXCHANGE_RATES = {
   GBP: 1.0,    // Base currency
   EUR: 1.15,   // 1 GBP = 1.15 EUR
+  USD: 1.33,   // 1 GBP = 1.33 USD
   // AUD: 1.85, // Easy to add in the future
 } as const;
 
@@ -75,6 +76,7 @@ export function formatCurrency(amount: number, currency: Currency): string {
   const symbols = {
     GBP: '£',
     EUR: '€',
+    USD: '$',
     // AUD: 'A$',
   };
   

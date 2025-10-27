@@ -20,8 +20,8 @@ type FAQItem = {
 
 // Function to generate dynamic FAQ data based on currency
 function getFAQData(currency: Currency): FAQItem[] {
-  const currencySymbol = currency === 'GBP' ? '£' : '€';
-  const currencyAmount = currency === 'GBP' ? '1,00' : '1,15';
+  const currencySymbol = currency === 'GBP' ? '£' : currency === 'EUR' ? '€' : '$';
+  const currencyAmount = currency === 'GBP' ? '1,00' : currency === 'EUR' ? '1,15' : '1,33';
   
   return [
     // Top Questions
@@ -420,22 +420,27 @@ function FAQContent() {
   const [contactMessage, setContactMessage] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Currency state
-  const [currency, setCurrency] = useState<Currency>(() => {
-    if (typeof window === 'undefined') return 'GBP';
+  // Currency state - Always start with GBP for SSR (prevents hydration mismatch)
+  const [currency, setCurrency] = useState<Currency>('GBP');
+  const [mounted, setMounted] = useState(false);
+
+  // Initialize currency from localStorage after mounting
+  useEffect(() => {
+    setMounted(true);
     try {
-      return (localStorage.getItem('currency') as Currency) || 'GBP';
-    } catch {
-      return 'GBP';
-    }
-  });
+      const saved = localStorage.getItem('currency') as Currency;
+      if (saved && (saved === 'GBP' || saved === 'EUR' || saved === 'USD')) {
+        setCurrency(saved);
+      }
+    } catch {}
+  }, []);
 
   // Listen for currency changes from header using BroadcastChannel
   useEffect(() => {
     const bc = new BroadcastChannel('app-events');
     
     const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === 'currency-updated' && (event.data.currency === 'GBP' || event.data.currency === 'EUR')) {
+      if (event.data.type === 'currency-updated' && (event.data.currency === 'GBP' || event.data.currency === 'EUR' || event.data.currency === 'USD')) {
         setCurrency(event.data.currency);
       }
     };

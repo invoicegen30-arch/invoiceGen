@@ -25,6 +25,7 @@ function formatCurrencyPrecise(amount: number, currency: Currency): string {
   const symbols = {
     GBP: '£',
     EUR: '€',
+    USD: '$',
   };
   const symbol = symbols[currency] || currency;
 
@@ -209,7 +210,8 @@ export default function TokenCalculatorPage() {
               <Segmented
                 options={[
                   { value: 'GBP', label: 'GBP (£)' },
-                  { value: 'EUR', label: 'EUR (€)' }
+                  { value: 'EUR', label: 'EUR (€)' },
+                  { value: 'USD', label: 'USD ($)' }
                 ]}
                 value={currency}
                 onChange={handleCurrencyChange}
@@ -357,7 +359,7 @@ export default function TokenCalculatorPage() {
           <h3 className="text-xl font-semibold text-slate-900 mb-6 text-center">
             Popular Examples
           </h3>
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             <ExampleCard
               currency="GBP"
               amount={10}
@@ -372,6 +374,14 @@ export default function TokenCalculatorPage() {
               onSelect={() => {
                 setCurrency('EUR');
                 setAmount(11.50);
+              }}
+            />
+            <ExampleCard
+              currency="USD"
+              amount={13.30}
+              onSelect={() => {
+                setCurrency('USD');
+                setAmount(13.30);
               }}
             />
           </div>

@@ -60,11 +60,13 @@ export default function TrustedBy() {
       </div>
 
       {/* Mobile marquee */}
-      <div className="sm:hidden overflow-hidden relative mt-2">
-        <div className={`flex gap-6 items-center ${reduce ? '' : 'animate-[marquee_14s_linear_infinite]'} hover:[animation-play-state:paused]`}
+      <div className="sm:hidden overflow-hidden relative mt-2 -mx-4 px-4">
+        <div className={`flex gap-4 items-center whitespace-nowrap ${reduce ? '' : 'animate-[marquee_14s_linear_infinite]'} hover:[animation-play-state:paused]`}
              aria-label="Trusted by marquee">
           {[...items, ...items].map((b, i) => (
-            <LogoMonoColor key={`${b.id}-${i}`} brand={b} height={22} priority={i < 3} />
+            <div key={`${b.id}-${i}`} className="flex-shrink-0">
+              <LogoMonoColor brand={b} height={20} priority={i < 3} />
+            </div>
           ))}
         </div>
       </div>

@@ -18,7 +18,7 @@ import {calculateTokens, formatCurrency, type Currency} from '@/lib/currency';
 const COUNTRIES = Object.keys(CC);
 
 function money(n: number, currency: Currency) {
-  const locale = currency === 'GBP' ? 'en-GB' : 'en-IE';
+  const locale = currency === 'GBP' ? 'en-GB' : currency === 'EUR' ? 'en-IE' : 'en-US';
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
@@ -86,7 +86,7 @@ export default function PricingClient() {
       bcRef.current = new BroadcastChannel('app-events');
       bcRef.current.onmessage = (ev: MessageEvent) => {
         const data: any = (ev as any)?.data || {};
-        if (data.type === 'currency-updated' && (data.currency === 'GBP' || data.currency === 'EUR')) {
+        if (data.type === 'currency-updated' && (data.currency === 'GBP' || data.currency === 'EUR' || data.currency === 'USD')) {
           setCurrency(data.currency);
           try {
             localStorage.setItem('currency', data.currency);
@@ -112,7 +112,7 @@ export default function PricingClient() {
     setIsLoading(planId);
     try {
       const plan = pricingPlans.find((p) => p.id === planId);
-      const amount = customAmount || (currency === 'GBP' ? plan?.baseGBP : plan?.baseEUR) || 0;
+      const amount = customAmount || (currency === 'GBP' ? plan?.baseGBP : currency === 'EUR' ? plan?.baseEUR : plan?.baseUSD) || 0;
       const tokens =
         plan?.tokens ||
         Math.max(0, calculateTokens(amount, currency));
@@ -153,6 +153,7 @@ export default function PricingClient() {
               options={[
                 {label: 'GBP', value: 'GBP'},
                 {label: 'EUR', value: 'EUR'},
+                {label: 'USD', value: 'USD'},
               ]}
               value={currency}
               onChange={(v) => setCurrency(v as Currency)}
@@ -173,7 +174,7 @@ export default function PricingClient() {
 
         <div className="mt-10 grid md:grid-cols-3 lg:grid-cols-4 gap-6">
           {pricingPlans.map((plan) => {
-            const base = currency === 'GBP' ? plan.baseGBP : plan.baseEUR;
+            const base = currency === 'GBP' ? plan.baseGBP : currency === 'EUR' ? plan.baseEUR : plan.baseUSD;
             const invoices = Math.round(plan.tokens / 10);
             const loading = isLoading === plan.id;
 
@@ -340,7 +341,7 @@ function CustomPlanCard({
         </span>
       </div>
       <div className="mt-3 flex items-center gap-2">
-        <span className="text-3xl font-bold">{currency === 'GBP' ? '£' : '€'}</span>
+        <span className="text-3xl font-bold">{currency === 'GBP' ? '£' : currency === 'EUR' ? '€' : '$'}</span>
         <input
           type="number"
           step="0.01"

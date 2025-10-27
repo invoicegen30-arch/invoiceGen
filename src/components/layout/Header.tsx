@@ -21,7 +21,7 @@ export default function Header() {
   const isTokenCalc = pathname === '/token-calculator';
   const isAbout = pathname === '/about';
   const isDashboard = pathname === '/dashboard';
-  const [currency, setCurrency] = useState<'GBP' | 'EUR'>('GBP');
+  const [currency, setCurrency] = useState<'GBP' | 'EUR' | 'USD'>('GBP');
   const [mounted, setMounted] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -36,8 +36,8 @@ export default function Header() {
   useEffect(() => {
     setMounted(true);
     try {
-      const savedCurrency = localStorage.getItem('currency') as 'GBP'|'EUR';
-      if (savedCurrency && (savedCurrency === 'GBP' || savedCurrency === 'EUR')) {
+      const savedCurrency = localStorage.getItem('currency') as 'GBP'|'EUR'|'USD';
+      if (savedCurrency && (savedCurrency === 'GBP' || savedCurrency === 'EUR' || savedCurrency === 'USD')) {
         setCurrency(savedCurrency);
       }
     } catch {}
@@ -51,7 +51,7 @@ export default function Header() {
         if (data.type === 'tokens-updated' && typeof data.tokenBalance === 'number') {
           setTokens(data.tokenBalance);
         }
-        if (data.type === 'currency-updated' && (data.currency === 'GBP' || data.currency === 'EUR')) {
+        if (data.type === 'currency-updated' && (data.currency === 'GBP' || data.currency === 'EUR' || data.currency === 'USD')) {
           setCurrency(data.currency);
           try { localStorage.setItem('currency', data.currency); } catch {}
         }
@@ -62,7 +62,7 @@ export default function Header() {
 
   useEffect(() => { setMounted(true); }, []);
 
-  const onCurrencyChange = (next: 'GBP'|'EUR') => {
+  const onCurrencyChange = (next: 'GBP'|'EUR'|'USD') => {
     setCurrency(next);
     try { localStorage.setItem('currency', next); } catch {}
     try { bcRef.current?.postMessage({ type: 'currency-updated', currency: next }); } catch {}
@@ -159,9 +159,9 @@ export default function Header() {
           <div className="hidden md:block">
             {mounted && (
               <Segmented
-                options={[{ label: 'GBP', value: 'GBP' }, { label: 'EUR', value: 'EUR' }]}
+                options={[{ label: 'GBP', value: 'GBP' }, { label: 'EUR', value: 'EUR' }, { label: 'USD', value: 'USD' }]}
                 value={currency}
-                onChange={(v)=>onCurrencyChange(v as 'GBP'|'EUR')}
+                onChange={(v)=>onCurrencyChange(v as 'GBP'|'EUR'|'USD')}
               />
             )}
           </div>
@@ -288,9 +288,9 @@ export default function Header() {
                   <div className="mt-4">
                     <div className="mb-2 text-xs text-slate-500">Currency</div>
                     <Segmented
-                      options={[{ label: 'GBP', value: 'GBP' }, { label: 'EUR', value: 'EUR' }]}
+                      options={[{ label: 'GBP', value: 'GBP' }, { label: 'EUR', value: 'EUR' }, { label: 'USD', value: 'USD' }]}
                       value={currency}
-                      onChange={(v)=>onCurrencyChange(v as 'GBP'|'EUR')}
+                      onChange={(v)=>onCurrencyChange(v as 'GBP'|'EUR'|'USD')}
                     />
                   </div>
 

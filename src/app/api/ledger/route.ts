@@ -22,7 +22,7 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
   const type = (body.type as string) || 'Top-up';
   const amount = Number(body.amount ?? 0);
-  const currency = (body.currency as 'GBP' | 'EUR') || ((session.user as any).currency ?? 'GBP');
+  const currency = (body.currency as 'GBP' | 'EUR' | 'USD') || ((session.user as any).currency ?? 'GBP');
 
   if (type === 'Top-up' && !amount) return NextResponse.json({ error: 'Amount required' }, { status: 400 });
 

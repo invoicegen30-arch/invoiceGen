@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Footer() {
   return (
@@ -13,7 +14,33 @@ export default function Footer() {
       viewport={{ once: true }}
     >
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-5 gap-8 text-sm">
+        <div className="flex justify-center">
+          <div className="grid md:grid-cols-6 gap-8 text-sm">
+            {/* Company - данные компании */}
+          <div>
+            <div className="font-semibold mb-2">Company</div>
+            <div className="grid gap-1 text-slate-700 text-xs leading-relaxed">
+              <div className="font-medium">GET STUFFED LTD</div>
+              <div>Reg: 15673179</div>
+              <div className="mt-1">
+                Flat 21 County Chambers,<br />
+                1 Drapery, Northampton,<br />
+                United Kingdom, NN1 2ET
+              </div>
+              <div className="mt-1">
+                <a href="mailto:info@invoicerly.co.uk" className="hover:underline">
+                  info@invoicerly.co.uk
+                </a>
+              </div>
+              <div>
+                <a href="tel:+447537103023" className="hover:underline">
+                  +44 7537 103023
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Product */}
           <div>
             <div className="font-semibold mb-2">Product</div>
             <div className="grid gap-1 text-slate-700">
@@ -22,15 +49,21 @@ export default function Footer() {
               <Link href="/token-calculator" className="hover:underline">Token Calculator</Link>
             </div>
           </div>
+
+          {/* Help - добавлены About и Contact, отсортировано по алфавиту */}
           <div>
             <div className="font-semibold mb-2">Help</div>
             <div className="grid gap-1 text-slate-700">
+              <Link href="/about" className="hover:underline">About</Link>
+              <Link href="/help/billing-tokens" className="hover:underline">Billing & Tokens</Link>
+              <Link href="/contact" className="hover:underline">Contact</Link>
               <Link href="/help/faq" className="hover:underline">FAQ</Link>
               <Link href="/help/getting-started" className="hover:underline">Getting Started</Link>
-              <Link href="/help/billing-tokens" className="hover:underline">Billing & Tokens</Link>
               <Link href="/help/troubleshooting" className="hover:underline">Troubleshooting</Link>
             </div>
           </div>
+
+          {/* Legal */}
           <div>
             <div className="font-semibold mb-2">Legal</div>
             <div className="grid gap-1 text-slate-700">
@@ -40,13 +73,29 @@ export default function Footer() {
               <Link href="/refund" className="hover:underline">Refund</Link>
             </div>
           </div>
+
+          {/* Payment methods - новая колонка */}
           <div>
-            <div className="font-semibold mb-2">Company</div>
-            <div className="grid gap-1 text-slate-700">
-              <Link href="/about" className="hover:underline">About</Link>
-              <Link href="/contact" className="hover:underline">Contact</Link>
+            <div className="font-semibold mb-2">Payment methods</div>
+            <div className="grid gap-3">
+              <Image 
+                src="/visa-logo.svg" 
+                alt="Visa" 
+                width={60} 
+                height={20}
+                className="object-contain"
+              />
+              <Image 
+                src="/mastercard-logo.svg" 
+                alt="MasterCard" 
+                width={60} 
+                height={20}
+                className="object-contain"
+              />
             </div>
           </div>
+
+          {/* Meta */}
           <div>
             <div className="font-semibold mb-2">Meta</div>
             <div className="grid gap-2 text-slate-700">
@@ -64,6 +113,7 @@ export default function Footer() {
               </div>
             </div>
           </div>
+        </div>
         </div>
         <div className="mt-8 flex items-center justify-between text-xs text-slate-600">
           <div>(c) {new Date().getFullYear()} Invoicerly - All rights reserved</div>
