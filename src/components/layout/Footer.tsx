@@ -15,7 +15,7 @@ export default function Footer() {
     >
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-center">
-          <div className="grid md:grid-cols-6 gap-8 text-sm">
+          <div className="grid md:grid-cols-5 gap-8 text-sm">
             {/* Company - данные компании */}
           <div>
             <div className="font-semibold mb-2">Company</div>
@@ -74,27 +74,6 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Payment methods - новая колонка */}
-          <div>
-            <div className="font-semibold mb-2">Payment methods</div>
-            <div className="grid gap-3">
-              <Image 
-                src="/visa-logo.svg" 
-                alt="Visa" 
-                width={60} 
-                height={20}
-                className="object-contain"
-              />
-              <Image 
-                src="/mastercard-logo.svg" 
-                alt="MasterCard" 
-                width={60} 
-                height={20}
-                className="object-contain"
-              />
-            </div>
-          </div>
-
           {/* Meta */}
           <div>
             <div className="font-semibold mb-2">Meta</div>
@@ -117,7 +96,22 @@ export default function Footer() {
         </div>
         <div className="mt-8 flex items-center justify-between text-xs text-slate-600">
           <div>(c) {new Date().getFullYear()} Invoicerly - All rights reserved</div>
-          <div>Made in UK</div>
+          <div className="flex items-center gap-3">
+            <Image 
+              src="/visa-logo.svg" 
+              alt="Visa" 
+              width={60} 
+              height={20}
+              className="object-contain"
+            />
+            <Image 
+              src="/mastercard-logo.svg" 
+              alt="MasterCard" 
+              width={60} 
+              height={20}
+              className="object-contain"
+            />
+          </div>
         </div>
       </section>
     </motion.footer>

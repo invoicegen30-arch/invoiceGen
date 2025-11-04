@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { toast } from "sonner";
@@ -42,6 +43,9 @@ export default function CheckoutPage() {
     address: Yup.string().required("Billing address is required"),
     city: Yup.string().required("City is required"),
     postalCode: Yup.string().required("Postal code is required"),
+    acceptedTerms: Yup.boolean()
+      .oneOf([true], "You must accept the Terms & Conditions")
+      .required("You must accept the Terms & Conditions"),
   });
 
   const handleCardNumberFormat = (value: string) =>
@@ -191,13 +195,33 @@ export default function CheckoutPage() {
 
                 <div className="mt-6 text-sm text-slate-500 leading-relaxed">
                   <p>
-                    You are purchasing <strong>{checkout.description}</strong>. Tokens
-                    will be credited after manager approval.
+                    You are purchasing <strong>{checkout.description}</strong>.
                   </p>
                   <p className="mt-2">
                     A detailed invoice will be emailed to{" "}
                     <strong>{checkout.email}</strong>.
                   </p>
+                </div>
+
+                {/* Policy Links */}
+                <div className="mt-6 pt-6 border-t border-slate-200">
+                  <div className="text-xs text-slate-600 space-y-2">
+                    <div>
+                      <Link href="/privacy" className="hover:underline text-indigo-600">
+                        Privacy Policy
+                      </Link>
+                    </div>
+                    <div>
+                      <Link href="/cookies" className="hover:underline text-indigo-600">
+                        Cookie Policy
+                      </Link>
+                    </div>
+                    <div>
+                      <Link href="/refund" className="hover:underline text-indigo-600">
+                        Refund Policy
+                      </Link>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -216,6 +240,7 @@ export default function CheckoutPage() {
                     address: "",
                     city: "",
                     postalCode: "",
+                    acceptedTerms: false,
                   }}
                   validationSchema={validationSchema}
                   onSubmit={handleSubmit}
@@ -332,11 +357,38 @@ export default function CheckoutPage() {
                         </div>
                       </div>
 
+                      {/* Terms & Conditions Checkbox */}
+                      <div className="mt-6">
+                        <label className="flex items-start gap-3 cursor-pointer">
+                          <Field
+                            type="checkbox"
+                            name="acceptedTerms"
+                            className="mt-1 h-4 w-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
+                          />
+                          <span className="text-sm text-slate-700">
+                            I accept the{" "}
+                            <Link
+                              href="/terms"
+                              className="text-indigo-600 hover:underline font-medium"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              Terms & Conditions
+                            </Link>
+                          </span>
+                        </label>
+                        <ErrorMessage
+                          name="acceptedTerms"
+                          component="div"
+                          className="text-red-500 text-xs mt-1"
+                        />
+                      </div>
+
                       <Button
                         className="w-full mt-6 flex items-center justify-center gap-2"
                         size="lg"
                         type="submit"
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || !values.acceptedTerms}
                       >
                         {isSubmitting ? (
                           <>
