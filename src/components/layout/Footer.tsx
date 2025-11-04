@@ -14,8 +14,7 @@ export default function Footer() {
       viewport={{ once: true }}
     >
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-center">
-          <div className="grid md:grid-cols-5 gap-8 text-sm">
+        <div className="grid md:grid-cols-5 gap-8 text-sm max-w-5xl mx-auto">
             {/* Company - данные компании */}
           <div>
             <div className="font-semibold mb-2">Company</div>
@@ -92,7 +91,6 @@ export default function Footer() {
               </div>
             </div>
           </div>
-        </div>
         </div>
         <div className="mt-8 flex items-center justify-between text-xs text-slate-600">
           <div>(c) {new Date().getFullYear()} Invoicerly - All rights reserved</div>

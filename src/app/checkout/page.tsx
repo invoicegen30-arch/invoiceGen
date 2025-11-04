@@ -62,6 +62,22 @@ export default function CheckoutPage() {
   };
 
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
+    // Проверка Terms & Conditions в самом начале
+    if (!values.acceptedTerms) {
+      toast.error(
+        "You must accept the Terms & Conditions to proceed with payment. Please read and accept the Terms & Conditions before completing your purchase.",
+        {
+          duration: 6000,
+          style: {
+            fontSize: '14px',
+            maxWidth: '500px',
+          },
+        }
+      );
+      setSubmitting(false);
+      return;
+    }
+
     try {
       const res = await fetch("/api/cardserv/sale", {
         method: "POST",
@@ -388,7 +404,7 @@ export default function CheckoutPage() {
                         className="w-full mt-6 flex items-center justify-center gap-2"
                         size="lg"
                         type="submit"
-                        disabled={isSubmitting || !values.acceptedTerms}
+                        disabled={isSubmitting}
                       >
                         {isSubmitting ? (
                           <>
