@@ -3,17 +3,17 @@ import { getCardServStatus } from "@/lib/cardserv";
 
 export async function POST(req: Request) {
   try {
-    const { orderMerchantId, currency } = await req.json();
+    const { orderMerchantId, orderSystemId, currency } = await req.json();
 
-    if (!orderMerchantId) {
+
+    if (!orderMerchantId || !currency) {
       return NextResponse.json(
-        { success: false, error: "Missing orderMerchantId" },
+        { success: false, error: "Missing orderMerchantId or currency" },
         { status: 400 }
       );
     }
 
-    // 🔥 currency може бути GBP / EUR / USD — передаємо її у статус
-    const statusData = await getCardServStatus(orderMerchantId, currency || "GBP");
+    const statusData = await getCardServStatus(orderMerchantId, orderSystemId, currency);
 
     return NextResponse.json(
       {
@@ -29,10 +29,10 @@ export async function POST(req: Request) {
     );
   } catch (err: any) {
     console.error("❌ CardServ status error:", err);
+
     return NextResponse.json(
       { success: false, error: err.message || "Status check failed" },
       { status: 500 }
     );
   }
 }
-

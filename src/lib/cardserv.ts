@@ -1,8 +1,8 @@
 import { randomUUID } from "crypto";
 
-// ------------------------------------
-// МАПА КОНФІГУРАЦІЙ ДЛЯ КОЖНОЇ ВАЛЮТИ
-// ------------------------------------
+/*==============================================
+=            CONFIG FOR EACH CURRENCY
+==============================================*/
 
 const CARD_SERV_CONFIG: Record<
   string,
@@ -25,24 +25,32 @@ const CARD_SERV_CONFIG: Record<
   },
 };
 
-// Якщо валюта не передана — беремо GBP як дефолт
 function getCfg(currency?: string) {
   return CARD_SERV_CONFIG[currency ?? "GBP"];
 }
 
-// ------------------------------------
-// ФУНКЦІЯ ОЧІКУВАННЯ
-// ------------------------------------
 function wait(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// ------------------------------------
-// STATUS (ПОВЕРТАЄ 3DS REDIRECT URL)
-// ------------------------------------
+/*==============================================
+=     COUNTRY CODE MAP (VERY IMPORTANT)
+==============================================*/
+
+const mapCountry: Record<string, string> = {
+  GBP: "GB",
+  EUR: "DE",
+  USD: "US",
+};
+
+/*==============================================
+=                 STATUS CHECK
+==============================================*/
+
 export async function getCardServStatus(
   orderMerchantId: string,
-  currency: string = "GBP"
+  orderSystemId?: string,
+  currency = "GBP"
 ) {
   const { REQUESTOR_ID, TOKEN } = getCfg(currency);
 
@@ -52,37 +60,54 @@ export async function getCardServStatus(
 
   const url = `${baseUrl}/api/payments/status/${REQUESTOR_ID}`;
 
+  console.log("🟧 STATUS → REQUEST:", {
+    url,
+    orderMerchantId,
+    orderSystemId,
+    currency,
+  });
+
   const res = await fetch(url, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${TOKEN}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ orderMerchantId }),
+    body: JSON.stringify({
+      orderMerchantId,
+      orderSystemId: orderSystemId ?? undefined,
+    }),
   });
 
   const text = await res.text();
-  let data: any = {};
+  console.log("🟥 STATUS RAW RESPONSE:", text);
 
+  let data: any = {};
   try {
     data = JSON.parse(text);
-  } catch {
-    console.error("❌ Non-JSON STATUS:", text.slice(0, 200));
-  }
+  } catch {}
+
+  const redirectUrl =
+    data?.redirectData?.redirectUrl ||
+    data?.redirectData?.threeDSRedirectUrl ||
+    data?.outputRedirectToUrl ||
+    null;
 
   return {
     ok: res.ok,
-    orderMerchantId: orderMerchantId,
-    orderSystemId: data.orderSystemId ?? null,
+    orderMerchantId,
+    orderSystemId: data.orderSystemId ?? orderSystemId,
     orderState: data.orderState ?? "PROCESSING",
-    redirectUrl: data.outputRedirectToUrl ?? null,
+    redirectUrl,
     raw: data,
   };
 }
 
-// ------------------------------------
-// SALE (СТВОРЕННЯ ОПЛАТИ + 3DS)
-// ------------------------------------
+
+/*==============================================
+=               CREATE SALE ORDER
+==============================================*/
+
 export async function createCardServOrder(payload: any) {
   const merchantOrderId = randomUUID();
 
@@ -98,16 +123,21 @@ export async function createCardServOrder(payload: any) {
   const body = {
     order: {
       orderMerchantId: merchantOrderId,
-      orderDescription: payload.description || `Top-up`,
+      orderDescription: payload.description || "Top-up",
       orderAmount: Number(payload.amount).toFixed(2),
       orderCurrencyCode: CURRENCY,
+      challengeIndicator: "04",
     },
     browser: {
       ipAddress: payload.ip || "8.8.8.8",
-      acceptHeader: "*/*",
+      acceptHeader:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
       colorDepth: 32,
       javascriptEnabled: "true",
+
+      // must be ≤8 chars
       acceptLanguage: "en-US",
+
       screenHeight: 1080,
       screenWidth: 1920,
       timeZone: -180,
@@ -120,7 +150,7 @@ export async function createCardServOrder(payload: any) {
       lastname: (payload.card?.name ?? "John Doe").split(" ")[1] ?? "Doe",
       customerEmail: payload.email,
       address: {
-        countryCode: "GB",
+        countryCode: mapCountry[CURRENCY] ?? "GB",
         zipCode: payload.card?.postalCode || "00000",
         city: payload.card?.city || "London",
         line1: payload.card?.address || "Unknown street",
@@ -139,6 +169,8 @@ export async function createCardServOrder(payload: any) {
     },
   };
 
+  console.log("🟦 SALE → REQUEST:", { url, body });
+
   const res = await fetch(url, {
     method: "POST",
     headers: {
@@ -149,30 +181,46 @@ export async function createCardServOrder(payload: any) {
   });
 
   const txt = await res.text();
-  let saleRes = {};
+  console.log("🟩 SALE RAW RESPONSE:", txt);
+
+  let saleRes: any = {};
   try {
     saleRes = JSON.parse(txt);
   } catch {}
 
-  // чекати генерацію 3DS
+  const returnedMerchantId =
+    saleRes?.order?.orderMerchantId || merchantOrderId;
+
+  const orderSystemId = saleRes?.orderSystemId || saleRes?.order?.orderSystemId;
+
+  console.log("🟩 MERCHANT ORDER ID USED:", returnedMerchantId);
+  console.log("🟩 ORDER SYSTEM ID:", orderSystemId);
+
+  // wait for redirect to generate
   await wait(1500);
 
-  let status = await getCardServStatus(merchantOrderId, payload.currency);
+  let status = await getCardServStatus(
+    returnedMerchantId,
+    orderSystemId,
+    payload.currency
+  );
 
   if (!status.redirectUrl) {
+    console.log("⌛ Waiting more for redirect...");
     await wait(2000);
-    status = await getCardServStatus(merchantOrderId, payload.currency);
+    status = await getCardServStatus(
+      returnedMerchantId,
+      orderSystemId,
+      payload.currency
+    );
   }
 
   return {
     ok: res.ok,
-    orderMerchantId: merchantOrderId,   // ← ФІКС
+    orderMerchantId: returnedMerchantId,
     orderSystemId: status.orderSystemId,
     orderState: status.orderState,
     redirectUrl: status.redirectUrl,
-    raw: {
-      sale: saleRes,
-      status,
-    },
+    raw: { sale: saleRes, status },
   };
 }

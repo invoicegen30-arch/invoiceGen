@@ -13,14 +13,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false }, { status: 400 });
     }
 
-    // 🔹 Отримуємо актуальний статус
     const dbOrder = await db.order.findFirst({ where: { orderMerchantId } });
-    const statusData = await getCardServStatus(orderMerchantId, dbOrder?.currency || "GBP");
+
+    const statusData = await getCardServStatus(
+      orderMerchantId,
+      dbOrder?.orderSystemId ? String(dbOrder.orderSystemId) : undefined,
+      dbOrder?.currency || "GBP"
+    );
 
     console.log("🔹 Webhook statusData:", statusData.orderState);
 
-    // 🔹 Оновлюємо статус у базі
-    const order = await db.order.updateMany({
+    await db.order.updateMany({
       where: { orderMerchantId },
       data: {
         status: statusData.orderState,
@@ -28,7 +31,6 @@ export async function POST(req: Request) {
       },
     });
 
-    // 🔹 Якщо оплата успішна — нараховуємо токени
     if (statusData.orderState === "APPROVED") {
       const dbOrder = await db.order.findFirst({
         where: { orderMerchantId },

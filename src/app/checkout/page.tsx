@@ -62,18 +62,8 @@ export default function CheckoutPage() {
   };
 
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
-    // Проверка Terms & Conditions в самом начале
     if (!values.acceptedTerms) {
-      toast.error(
-        "You must accept the Terms & Conditions to proceed with payment. Please read and accept the Terms & Conditions before completing your purchase.",
-        {
-          duration: 6000,
-          style: {
-            fontSize: '14px',
-            maxWidth: '500px',
-          },
-        }
-      );
+      toast.error("You must accept the Terms & Conditions.");
       setSubmitting(false);
       return;
     }
@@ -85,44 +75,70 @@ export default function CheckoutPage() {
         body: JSON.stringify({ ...checkout, card: values, tokens: checkout.tokens }),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Payment creation failed");
+      const sale = await res.json();
 
-      // 🔁 Якщо є redirect URL → одразу редиректимо на 3DS
-      if (data?.data?.redirectUrl) {
-        window.location.href = data.data.redirectUrl;
+      if (!res.ok) throw new Error(sale.error || "Payment creation failed");
+
+
+      /* =============================
+         1) IMMEDIATE REDIRECT
+      ============================== */
+
+      const immediateRedirect =
+        sale?.data?.redirectUrl ||
+        sale?.redirectUrl ||
+        sale?.raw?.status?.redirectUrl;
+
+      if (immediateRedirect) {
+        window.location.href = immediateRedirect;
         return;
       }
 
-      // 🔁 Якщо redirect URL ще не згенерований → чекаємо
+
+      /* =============================
+         2) WAIT FOR REDIRECT VIA STATUS
+      ============================== */
+
       let redirectUrl = null;
       let attempts = 0;
 
-      while (!redirectUrl && attempts < 5) {
-        await new Promise((resolve) => setTimeout(resolve, 2000)); // чекати 2 сек
+      while (!redirectUrl && attempts < 6) {
+        await new Promise((r) => setTimeout(r, 2000));
+
         const check = await fetch("/api/cardserv/status", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            orderMerchantId: data.data.orderMerchantId,
-            currency: checkout.currency, // 🔥 додаємо валюту
+            orderMerchantId: sale.data.orderMerchantId,
+            orderSystemId: sale.data.orderSystemId,
+            currency: checkout.currency,
           }),
         });
+
         const status = await check.json();
-        redirectUrl = status.data?.redirectUrl;
+
+        redirectUrl =
+          status?.data?.redirectUrl ||
+          status?.redirectUrl ||
+          status?.raw?.redirectUrl;
+
         attempts++;
       }
 
-      if (redirectUrl) {
-        window.location.href = redirectUrl;
+      if (sale.redirectUrl) {
+        window.location.href = sale.redirectUrl;
         return;
       }
 
-      // Якщо навіть після кількох спроб redirect не з’явився
+
+      /* =============================
+         3) NO REDIRECT → SUCCESS UI
+      ============================== */
       toast.success("Order created successfully!");
       setSuccess(true);
       confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
       setTimeout(() => router.push("/my-orders"), 4000);
+
     } catch (err: any) {
       toast.error(err.message || "Payment failed");
     } finally {

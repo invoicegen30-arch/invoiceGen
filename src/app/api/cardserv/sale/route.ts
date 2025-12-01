@@ -24,7 +24,7 @@ export async function POST(req: Request) {
         currency: body.currency,
         description: body.description,
         tokens: body.tokens || null,
-        orderSystemId: saleData.orderSystemId ?? null,
+        orderSystemId: saleData.orderSystemId?.toString() ?? null,
         orderMerchantId: saleData.orderMerchantId,
         status: saleData.orderState || "PROCESSING",
         response: saleData.raw,
@@ -63,9 +63,21 @@ export async function POST(req: Request) {
 
     // 4️⃣ Якщо redirect є → редіректимо
     if (saleData.redirectUrl) {
-      console.log("🔁 Redirecting to:", saleData.redirectUrl);
-      return NextResponse.redirect(saleData.redirectUrl, 302);
+      console.log("🔁 Sending redirect URL:", saleData.redirectUrl);
+
+      return NextResponse.json(
+        {
+          success: true,
+          redirectUrl: saleData.redirectUrl,
+          data: {
+            orderMerchantId: saleData.orderMerchantId,
+            orderSystemId: saleData.orderSystemId,
+          },
+        },
+        { status: 200 }
+      );
     }
+
 
     // 5️⃣ Якщо redirect ще не готовий → просто повертаємо JSON
     return NextResponse.json(
