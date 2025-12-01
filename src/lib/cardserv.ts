@@ -72,9 +72,9 @@ export async function getCardServStatus(
 
   return {
     ok: res.ok,
-    statusCode: res.status,
-    orderState: data.orderState ?? "PROCESSING",
+    orderMerchantId: orderMerchantId,
     orderSystemId: data.orderSystemId ?? null,
+    orderState: data.orderState ?? "PROCESSING",
     redirectUrl: data.outputRedirectToUrl ?? null,
     raw: data,
   };
@@ -166,7 +166,7 @@ export async function createCardServOrder(payload: any) {
 
   return {
     ok: res.ok,
-    orderMerchantId,
+    orderMerchantId: merchantOrderId,   // ← ФІКС
     orderSystemId: status.orderSystemId,
     orderState: status.orderState,
     redirectUrl: status.redirectUrl,
