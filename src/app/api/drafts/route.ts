@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { Currency } from '@prisma/client';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -12,7 +13,10 @@ export async function POST(req: Request) {
   const userId = (session.user as any).id as string;
 
   const body = await req.json().catch(() => ({}));
-  const currency = (body.currency as 'GBP' | 'EUR' | 'USD') || ((session.user as any).currency ?? 'GBP');
+  const currency =
+    (body.currency as Currency) ||
+    ((session.user as any).currency as Currency) ||
+    Currency.GBP;
   const client = (body.client as string) || 'New Client';
   const toDec = (v: any) => typeof v === 'number' ? v.toFixed(2) : (Number(v||0)).toFixed(2);
   const subtotal = toDec(body.subtotal ?? 0);

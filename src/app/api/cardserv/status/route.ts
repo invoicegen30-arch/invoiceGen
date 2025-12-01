@@ -3,7 +3,7 @@ import { getCardServStatus } from "@/lib/cardserv";
 
 export async function POST(req: Request) {
   try {
-    const { orderMerchantId } = await req.json();
+    const { orderMerchantId, currency } = await req.json();
 
     if (!orderMerchantId) {
       return NextResponse.json(
@@ -12,7 +12,8 @@ export async function POST(req: Request) {
       );
     }
 
-    const statusData = await getCardServStatus(orderMerchantId);
+    // 🔥 currency може бути GBP / EUR / USD — передаємо її у статус
+    const statusData = await getCardServStatus(orderMerchantId, currency || "GBP");
 
     return NextResponse.json(
       {
@@ -34,3 +35,4 @@ export async function POST(req: Request) {
     );
   }
 }
+

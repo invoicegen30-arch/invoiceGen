@@ -103,7 +103,10 @@ export default function CheckoutPage() {
         const check = await fetch("/api/cardserv/status", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderMerchantId: data.data.orderMerchantId }),
+          body: JSON.stringify({
+            orderMerchantId: data.data.orderMerchantId,
+            currency: checkout.currency, // 🔥 додаємо валюту
+          }),
         });
         const status = await check.json();
         redirectUrl = status.data?.redirectUrl;

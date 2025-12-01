@@ -1,31 +1,63 @@
 import { randomUUID } from "crypto";
 
-// Допоміжна функція для затримки
+// ------------------------------------
+// МАПА КОНФІГУРАЦІЙ ДЛЯ КОЖНОЇ ВАЛЮТИ
+// ------------------------------------
+
+const CARD_SERV_CONFIG: Record<
+  string,
+  { REQUESTOR_ID: string; TOKEN: string; CURRENCY: string }
+> = {
+  GBP: {
+    REQUESTOR_ID: process.env.CARDSERV_REQUESTOR_ID_GBP!,
+    TOKEN: process.env.CARDSERV_BEARER_TOKEN_GBP!,
+    CURRENCY: "GBP",
+  },
+  EUR: {
+    REQUESTOR_ID: process.env.CARDSERV_REQUESTOR_ID_EUR!,
+    TOKEN: process.env.CARDSERV_BEARER_TOKEN_EUR!,
+    CURRENCY: "EUR",
+  },
+  USD: {
+    REQUESTOR_ID: process.env.CARDSERV_REQUESTOR_ID_USD!,
+    TOKEN: process.env.CARDSERV_BEARER_TOKEN_USD!,
+    CURRENCY: "USD",
+  },
+};
+
+// Якщо валюта не передана — беремо GBP як дефолт
+function getCfg(currency?: string) {
+  return CARD_SERV_CONFIG[currency ?? "GBP"];
+}
+
+// ------------------------------------
+// ФУНКЦІЯ ОЧІКУВАННЯ
+// ------------------------------------
 function wait(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-/**
- * Отримати статус ордеру з CardServ (включно з 3DS redirect URL)
- */
-export async function getCardServStatus(orderMerchantId: string) {
-  const {
-    CARDSERV_BASE_URL,
-    CARDSERV_REQUESTOR_ID,
-    CARDSERV_BEARER_TOKEN,
-  } = process.env;
+// ------------------------------------
+// STATUS (ПОВЕРТАЄ 3DS REDIRECT URL)
+// ------------------------------------
+export async function getCardServStatus(
+  orderMerchantId: string,
+  currency: string = "GBP"
+) {
+  const { REQUESTOR_ID, TOKEN } = getCfg(currency);
 
-  const baseUrl = CARDSERV_BASE_URL?.replace(/\/+$/, "") || "https://test.cardserv.io";
-  const url = `${baseUrl}/api/payments/status/${CARDSERV_REQUESTOR_ID}`; // ✅ правильний endpoint
+  const baseUrl =
+    process.env.CARDSERV_BASE_URL?.replace(/\/+$/, "") ||
+    "https://test.cardserv.io";
 
-  const headers = {
-    Authorization: `Bearer ${CARDSERV_BEARER_TOKEN}`,
-    "Content-Type": "application/json",
-  };
+  const url = `${baseUrl}/api/payments/status/${REQUESTOR_ID}`;
 
   const res = await fetch(url, {
     method: "POST",
-    headers,
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({ orderMerchantId }),
   });
 
@@ -35,53 +67,44 @@ export async function getCardServStatus(orderMerchantId: string) {
   try {
     data = JSON.parse(text);
   } catch {
-    console.error("❌ CardServ status returned non-JSON:", text.slice(0, 150));
+    console.error("❌ Non-JSON STATUS:", text.slice(0, 200));
   }
-
-  console.log("✅ CardServ STATUS:", data);
 
   return {
     ok: res.ok,
     statusCode: res.status,
-    orderSystemId: data.orderSystemId ? String(data.orderSystemId) : null,
     orderState: data.orderState ?? "PROCESSING",
+    orderSystemId: data.orderSystemId ?? null,
     redirectUrl: data.outputRedirectToUrl ?? null,
     raw: data,
   };
 }
 
-/**
- * Створення платежу (sale) + отримання статусу з redirect URL
- */
+// ------------------------------------
+// SALE (СТВОРЕННЯ ОПЛАТИ + 3DS)
+// ------------------------------------
 export async function createCardServOrder(payload: any) {
-  const {
-    CARDSERV_BASE_URL,
-    CARDSERV_REQUESTOR_ID,
-    CARDSERV_BEARER_TOKEN,
-    CARDSERV_CURRENCY,
-  } = process.env;
-
   const merchantOrderId = randomUUID();
 
-  const baseUrl = CARDSERV_BASE_URL?.replace(/\/+$/, "") || "https://test.cardserv.io";
-  const url = `${baseUrl}/api/payments/sale/${CARDSERV_REQUESTOR_ID}`;
+  const cfg = getCfg(payload.currency);
+  const { REQUESTOR_ID, TOKEN, CURRENCY } = cfg;
 
-  const headers = {
-    Authorization: `Bearer ${CARDSERV_BEARER_TOKEN}`,
-    "Content-Type": "application/json",
-  };
+  const baseUrl =
+    process.env.CARDSERV_BASE_URL?.replace(/\/+$/, "") ||
+    "https://test.cardserv.io";
+
+  const url = `${baseUrl}/api/payments/sale/${REQUESTOR_ID}`;
 
   const body = {
     order: {
       orderMerchantId: merchantOrderId,
-      orderDescription: payload.description || `Top-up #${Date.now()}`,
-      orderAmount: (payload.amount ?? 1).toFixed(2),
-      orderCurrencyCode: CARDSERV_CURRENCY || "EUR",
+      orderDescription: payload.description || `Top-up`,
+      orderAmount: Number(payload.amount).toFixed(2),
+      orderCurrencyCode: CURRENCY,
     },
     browser: {
-      ipAddress: "2.58.95.68",
-      acceptHeader:
-        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+      ipAddress: payload.ip || "8.8.8.8",
+      acceptHeader: "*/*",
       colorDepth: 32,
       javascriptEnabled: "true",
       acceptLanguage: "en-US",
@@ -89,29 +112,26 @@ export async function createCardServOrder(payload: any) {
       screenWidth: 1920,
       timeZone: -180,
       userAgent:
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome Safari",
       javaEnabled: "false",
     },
     customer: {
-      firstname: payload.card?.name?.split(" ")[0] || "John",
-      lastname: payload.card?.name?.split(" ")[1] || "Doe",
-      customerEmail: payload.email || "test@example.com",
+      firstname: (payload.card?.name ?? "John Doe").split(" ")[0],
+      lastname: (payload.card?.name ?? "John Doe").split(" ")[1] ?? "Doe",
+      customerEmail: payload.email,
       address: {
         countryCode: "GB",
         zipCode: payload.card?.postalCode || "00000",
         city: payload.card?.city || "London",
-        line1: payload.card?.address || "123 Baker Street",
+        line1: payload.card?.address || "Unknown street",
       },
     },
     card: {
-      cardNumber: payload.card?.cardNumber || "4444444444444422",
-      cvv2: payload.card?.cvv || "123",
-      expireMonth: payload.card?.expiry?.split("/")[0] || "10",
-      expireYear: `20${payload.card?.expiry?.split("/")[1] || "26"}`,
-      cardPrintedName:
-        (payload.card?.name && payload.card?.name.trim().length >= 2
-          ? payload.card.name.trim()
-          : "John Doe"),
+      cardNumber: payload.card.cardNumber.replace(/\s/g, ""),
+      cvv2: payload.card.cvv,
+      expireMonth: payload.card.expiry.split("/")[0],
+      expireYear: `20${payload.card.expiry.split("/")[1]}`,
+      cardPrintedName: payload.card.name,
     },
     urls: {
       resultUrl: `${process.env.NEXT_PUBLIC_APP_URL}/success`,
@@ -119,40 +139,40 @@ export async function createCardServOrder(payload: any) {
     },
   };
 
-  // 🔹 1. Надсилаємо запит на створення транзакції (SALE)
   const res = await fetch(url, {
     method: "POST",
-    headers,
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(body),
   });
 
-  const text = await res.text();
-  let data: any = {};
+  const txt = await res.text();
+  let saleRes = {};
   try {
-    data = JSON.parse(text);
-  } catch {
-    console.error("❌ CardServ returned non-JSON:", text.slice(0, 150));
-  }
+    saleRes = JSON.parse(txt);
+  } catch {}
 
-  // 🔹 2. Чекаємо, поки транзакція створиться
+  // чекати генерацію 3DS
   await wait(1500);
 
-  // 🔹 3. Робимо STATUS-запит, щоб отримати redirect URL для 3DS
-  let statusData = await getCardServStatus(merchantOrderId);
+  let status = await getCardServStatus(merchantOrderId, payload.currency);
 
-  // 🔁 Повторна спроба, якщо redirect ще не згенерувався
-  if (!statusData.redirectUrl) {
+  if (!status.redirectUrl) {
     await wait(2000);
-    statusData = await getCardServStatus(merchantOrderId);
+    status = await getCardServStatus(merchantOrderId, payload.currency);
   }
 
   return {
     ok: res.ok,
-    statusCode: res.status,
-    orderSystemId: statusData.orderSystemId ?? data.orderSystemId ?? null,
-    orderMerchantId: merchantOrderId,
-    orderState: statusData.orderState ?? "PROCESSING",
-    redirectUrl: statusData.redirectUrl ?? null,
-    raw: { sale: data, status: statusData },
+    orderMerchantId,
+    orderSystemId: status.orderSystemId,
+    orderState: status.orderState,
+    redirectUrl: status.redirectUrl,
+    raw: {
+      sale: saleRes,
+      status,
+    },
   };
 }

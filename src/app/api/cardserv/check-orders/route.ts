@@ -22,7 +22,7 @@ export async function GET() {
 
     for (const order of processingOrders) {
       try {
-        const statusData = await getCardServStatus(order.orderMerchantId!);
+        const statusData = await getCardServStatus(order.orderMerchantId!, order.currency);
 
         // оновлюємо статус у БД
         await db.order.update({

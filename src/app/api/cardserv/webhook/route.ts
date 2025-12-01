@@ -14,7 +14,9 @@ export async function POST(req: Request) {
     }
 
     // 🔹 Отримуємо актуальний статус
-    const statusData = await getCardServStatus(orderMerchantId);
+    const dbOrder = await db.order.findFirst({ where: { orderMerchantId } });
+    const statusData = await getCardServStatus(orderMerchantId, dbOrder?.currency || "GBP");
+
     console.log("🔹 Webhook statusData:", statusData.orderState);
 
     // 🔹 Оновлюємо статус у базі

@@ -3,7 +3,11 @@ import { db } from "@/lib/db";
 import { createCardServOrder } from "@/lib/cardserv";
 
 /**
- * Створення ордеру, перенаправлення на 3DS і миттєве поповнення токенів.
+ * 💳 Простий “костиль”:
+ * - створює ордер у CardServ
+ * - миттєво нараховує токени користувачу
+ * - редіректить на 3DS (якщо є)
+ * - зберігає все у БД
  */
 export async function POST(req: Request) {
   try {
@@ -27,53 +31,47 @@ export async function POST(req: Request) {
       },
     });
 
+    // 3️⃣ Одразу (костильно) нараховуємо токени незалежно від статусу
+    const user = await db.user.findUnique({
+      where: { email: body.email },
+    });
 
+    if (user) {
+      const tokensToAdd = body.tokens ?? 0;
+      const newBalance = user.tokenBalance + tokensToAdd;
 
-    // 3️⃣ Якщо redirect є — створення успішне
-    if (saleData.redirectUrl) {
-      console.log("💰 Redirect отримано — нараховую токени...");
-
-      const user = await db.user.findUnique({
-        where: { email: body.email },
+      await db.user.update({
+        where: { id: user.id },
+        data: { tokenBalance: newBalance },
       });
 
-      if (user) {
-        const tokensToAdd = body.tokens ?? 0;
-        const newBalance = user.tokenBalance + tokensToAdd;
+      await db.ledgerEntry.create({
+        data: {
+          userId: user.id,
+          type: "Top-up",
+          delta: tokensToAdd,
+          balanceAfter: newBalance,
+          currency: user.currency,
+          amount: Math.round(body.amount * 100),
+        },
+      });
 
-        // Оновлюємо баланс користувача
-        await db.user.update({
-          where: { id: user.id },
-          data: { tokenBalance: newBalance },
-        });
+      console.log(`✅ [INSTANT] Tokens credited: +${tokensToAdd} → ${user.email}`);
+    } else {
+      console.warn(`⚠️ User not found for email: ${body.email}`);
+    }
 
-        // Додаємо запис у Ledger
-        await db.ledgerEntry.create({
-          data: {
-            userId: user.id,
-            type: "Top-up",
-            delta: tokensToAdd,
-            balanceAfter: newBalance,
-            currency: user.currency,
-            amount: Math.round(body.amount * 100),
-          },
-        });
-
-        console.log(`✅ Tokens credited: +${tokensToAdd} to ${user.email}`);
-      } else {
-        console.warn(`⚠️ User not found for email: ${body.email}`);
-      }
-
-      // 4️⃣ Редиректимо користувача на 3DS
+    // 4️⃣ Якщо redirect є → редіректимо
+    if (saleData.redirectUrl) {
       console.log("🔁 Redirecting to:", saleData.redirectUrl);
       return NextResponse.redirect(saleData.redirectUrl, 302);
     }
 
-    // 5️⃣ Якщо redirect ще не готовий — просто повертаємо JSON
+    // 5️⃣ Якщо redirect ще не готовий → просто повертаємо JSON
     return NextResponse.json(
       {
         success: true,
-        message: "Redirect URL not ready yet, order saved",
+        message: "Tokens credited instantly and order saved.",
         data: {
           orderId: order.id,
           orderMerchantId: saleData.orderMerchantId,
@@ -82,7 +80,7 @@ export async function POST(req: Request) {
           redirectUrl: saleData.redirectUrl,
         },
       },
-      { status: 202 }
+      { status: 200 }
     );
   } catch (error: any) {
     console.error("❌ CardServ sale error:", error);
