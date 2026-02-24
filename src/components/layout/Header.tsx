@@ -6,8 +6,14 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { THEME } from '@/lib/theme';
-import Segmented from '@/components/ui/Segmented';
+import Select from '@/components/ui/Select';
 import { useSession, signOut } from 'next-auth/react';
+import { type Currency, CURRENCY_OPTIONS } from '@/lib/currency';
+
+const VALID_CURRENCIES = CURRENCY_OPTIONS.map((o) => o.value);
+function isValidCurrency(s: string | null): s is Currency {
+  return s != null && VALID_CURRENCIES.includes(s as Currency);
+}
 
 export default function Header() {
   const pathname = usePathname();
@@ -21,7 +27,7 @@ export default function Header() {
   const isTokenCalc = pathname === '/token-calculator';
   const isAbout = pathname === '/about';
   const isDashboard = pathname === '/dashboard';
-  const [currency, setCurrency] = useState<'GBP' | 'EUR' | 'USD'>('GBP');
+  const [currency, setCurrency] = useState<Currency>('GBP');
   const [mounted, setMounted] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -36,8 +42,8 @@ export default function Header() {
   useEffect(() => {
     setMounted(true);
     try {
-      const savedCurrency = localStorage.getItem('currency') as 'GBP'|'EUR'|'USD';
-      if (savedCurrency && (savedCurrency === 'GBP' || savedCurrency === 'EUR' || savedCurrency === 'USD')) {
+      const savedCurrency = localStorage.getItem('currency');
+      if (savedCurrency && isValidCurrency(savedCurrency)) {
         setCurrency(savedCurrency);
       }
     } catch {}
@@ -51,7 +57,7 @@ export default function Header() {
         if (data.type === 'tokens-updated' && typeof data.tokenBalance === 'number') {
           setTokens(data.tokenBalance);
         }
-        if (data.type === 'currency-updated' && (data.currency === 'GBP' || data.currency === 'EUR' || data.currency === 'USD')) {
+        if (data.type === 'currency-updated' && isValidCurrency(data.currency)) {
           setCurrency(data.currency);
           try { localStorage.setItem('currency', data.currency); } catch {}
         }
@@ -62,7 +68,7 @@ export default function Header() {
 
   useEffect(() => { setMounted(true); }, []);
 
-  const onCurrencyChange = (next: 'GBP'|'EUR'|'USD') => {
+  const onCurrencyChange = (next: Currency) => {
     setCurrency(next);
     try { localStorage.setItem('currency', next); } catch {}
     try { bcRef.current?.postMessage({ type: 'currency-updated', currency: next }); } catch {}
@@ -158,11 +164,18 @@ export default function Header() {
         <div className="hidden sm:flex items-center gap-3">
           <div className="hidden md:block">
             {mounted && (
-              <Segmented
-                options={[{ label: 'GBP', value: 'GBP' }, { label: 'EUR', value: 'EUR' }, { label: 'USD', value: 'USD' }]}
+              <Select
+                aria-label="Currency"
                 value={currency}
-                onChange={(v)=>onCurrencyChange(v as 'GBP'|'EUR'|'USD')}
-              />
+                onChange={(e) => onCurrencyChange(e.target.value as Currency)}
+                className="w-auto min-w-[7rem] rounded-xl border border-black/10 bg-white py-2 text-sm text-slate-700"
+              >
+                {CURRENCY_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </Select>
             )}
           </div>
           {!signedIn ? (
@@ -287,11 +300,18 @@ export default function Header() {
 
                   <div className="mt-4">
                     <div className="mb-2 text-xs text-slate-500">Currency</div>
-                    <Segmented
-                      options={[{ label: 'GBP', value: 'GBP' }, { label: 'EUR', value: 'EUR' }, { label: 'USD', value: 'USD' }]}
+                    <Select
+                      aria-label="Currency"
                       value={currency}
-                      onChange={(v)=>onCurrencyChange(v as 'GBP'|'EUR'|'USD')}
-                    />
+                      onChange={(e) => onCurrencyChange(e.target.value as Currency)}
+                      className="w-full rounded-xl border border-black/10 bg-white py-2 text-sm text-slate-700"
+                    >
+                      {CURRENCY_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </Select>
                   </div>
 
                   <div className="mt-4 grid gap-2">

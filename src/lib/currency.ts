@@ -13,6 +13,16 @@ export const EXCHANGE_RATES = {
 
 export type Currency = keyof typeof EXCHANGE_RATES;
 
+/** Options for currency dropdown/select (value + label for UI) */
+export const CURRENCY_OPTIONS: { value: Currency; label: string }[] = [
+  { value: 'GBP', label: 'GBP (£)' },
+  { value: 'EUR', label: 'EUR (€)' },
+  { value: 'USD', label: 'USD ($)' },
+  { value: 'AUD', label: 'AUD (A$)' },
+  { value: 'CAD', label: 'CAD (C$)' },
+  { value: 'NZD', label: 'NZD (NZ$)' },
+];
+
 /**
  * Convert any currency amount to GBP (base currency)
  * @param amount - Amount in source currency

@@ -10,15 +10,24 @@ import {toast} from 'sonner';
 import Section from '@/components/layout/Section';
 import Pill from '@/components/policy/Pill';
 import Button from '@/components/ui/Button';
-import Segmented from '@/components/ui/Segmented';
+import Select from '@/components/ui/Select';
 import {CC, VAT_RATES} from '@/lib/constants';
 import {pricingPlans} from '@/lib/plans';
-import {calculateTokens, formatCurrency, type Currency} from '@/lib/currency';
+import {calculateTokens, formatCurrency, convertFromGBP, type Currency, CURRENCY_OPTIONS} from '@/lib/currency';
 
 const COUNTRIES = Object.keys(CC);
 
+const CURRENCY_SYMBOLS: Record<Currency, string> = {
+  GBP: '£', EUR: '€', USD: '$', AUD: 'A$', CAD: 'C$', NZD: 'NZ$',
+};
+
 function money(n: number, currency: Currency) {
-  const locale = currency === 'GBP' ? 'en-GB' : currency === 'EUR' ? 'en-IE' : 'en-US';
+  const locale =
+    currency === 'GBP' ? 'en-GB' :
+    currency === 'EUR' ? 'en-IE' :
+    currency === 'USD' ? 'en-US' :
+    currency === 'AUD' ? 'en-AU' :
+    currency === 'CAD' ? 'en-CA' : 'en-NZ';
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
@@ -86,7 +95,7 @@ export default function PricingClient() {
       bcRef.current = new BroadcastChannel('app-events');
       bcRef.current.onmessage = (ev: MessageEvent) => {
         const data: any = (ev as any)?.data || {};
-        if (data.type === 'currency-updated' && (data.currency === 'GBP' || data.currency === 'EUR' || data.currency === 'USD')) {
+        if (data.type === 'currency-updated' && CURRENCY_OPTIONS.some((o) => o.value === data.currency)) {
           setCurrency(data.currency);
           try {
             localStorage.setItem('currency', data.currency);
@@ -112,7 +121,7 @@ export default function PricingClient() {
     setIsLoading(planId);
     try {
       const plan = pricingPlans.find((p) => p.id === planId);
-      const amount = customAmount || (currency === 'GBP' ? plan?.baseGBP : currency === 'EUR' ? plan?.baseEUR : plan?.baseUSD) || 0;
+      const amount = customAmount || (currency === 'GBP' ? plan?.baseGBP : currency === 'EUR' ? plan?.baseEUR : currency === 'USD' ? plan?.baseUSD : plan ? convertFromGBP(plan.baseGBP, currency) : 0) || 0;
       const tokens =
         plan?.tokens ||
         Math.max(0, calculateTokens(amount, currency));
@@ -149,15 +158,18 @@ export default function PricingClient() {
           </p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <Segmented
-              options={[
-                {label: 'GBP', value: 'GBP'},
-                {label: 'EUR', value: 'EUR'},
-                {label: 'USD', value: 'USD'},
-              ]}
+            <Select
+              aria-label="Currency"
               value={currency}
-              onChange={(v) => setCurrency(v as Currency)}
-            />
+              onChange={(e) => setCurrency(e.target.value as Currency)}
+              className="min-w-[8rem] rounded-xl border border-black/10 bg-white px-3 py-2 text-sm"
+            >
+              {CURRENCY_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </Select>
             <select
               className="rounded-xl border border-black/10 bg-white px-3 py-2 text-sm"
               value={country}
@@ -174,7 +186,7 @@ export default function PricingClient() {
 
         <div className="mt-10 grid md:grid-cols-3 lg:grid-cols-4 gap-6">
           {pricingPlans.map((plan) => {
-            const base = currency === 'GBP' ? plan.baseGBP : currency === 'EUR' ? plan.baseEUR : plan.baseUSD;
+            const base = currency === 'GBP' ? plan.baseGBP : currency === 'EUR' ? plan.baseEUR : currency === 'USD' ? plan.baseUSD : convertFromGBP(plan.baseGBP, currency);
             const invoices = Math.round(plan.tokens / 10);
             const loading = isLoading === plan.id;
 
@@ -341,7 +353,7 @@ function CustomPlanCard({
         </span>
       </div>
       <div className="mt-3 flex items-center gap-2">
-        <span className="text-3xl font-bold">{currency === 'GBP' ? '£' : currency === 'EUR' ? '€' : '$'}</span>
+        <span className="text-3xl font-bold">{CURRENCY_SYMBOLS[currency]}</span>
         <input
           type="number"
           step="0.01"

@@ -5,8 +5,8 @@ import { motion } from 'framer-motion';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
-import Segmented from '@/components/ui/Segmented';
-import { calculateTokens, convertFromGBP, formatCurrency, type Currency } from '@/lib/currency';
+import Select from '@/components/ui/Select';
+import { calculateTokens, convertFromGBP, formatCurrency, type Currency, CURRENCY_OPTIONS } from '@/lib/currency';
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import { toast } from "sonner";
@@ -64,6 +64,28 @@ export default function TokenCalculatorPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const signedIn = status === "authenticated";
+
+  // Sync currency with header (localStorage + BroadcastChannel)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const saved = localStorage.getItem('currency') as Currency | null;
+      if (saved && CURRENCY_OPTIONS.some((o) => o.value === saved)) setCurrency(saved);
+    } catch {}
+  }, []);
+  useEffect(() => {
+    try {
+      const bc = new BroadcastChannel('app-events');
+      bc.onmessage = (ev: MessageEvent) => {
+        const data = (ev as any)?.data || {};
+        if (data.type === 'currency-updated' && CURRENCY_OPTIONS.some((o) => o.value === data.currency)) {
+          setCurrency(data.currency);
+          try { localStorage.setItem('currency', data.currency); } catch {}
+        }
+      };
+      return () => bc.close();
+    } catch { return () => {}; }
+  }, []);
   useEffect(() => {
     if (typeof window !== 'undefined') {
       // @ts-ignore
@@ -135,6 +157,8 @@ export default function TokenCalculatorPage() {
   const handleCurrencyChange = (value: string) => {
     const newCurrency = value as Currency;
     setCurrency(newCurrency);
+    try { localStorage.setItem('currency', newCurrency); } catch {}
+    try { new BroadcastChannel('app-events').postMessage({ type: 'currency-updated', currency: newCurrency }); } catch {}
 
     if (typeof window !== 'undefined') {
       // @ts-ignore
@@ -205,20 +229,23 @@ export default function TokenCalculatorPage() {
               Calculate Tokens
             </h2>
 
-            {/* Currency Toggle */}
+            {/* Currency selector */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-slate-700 mb-3">
                 Currency
               </label>
-              <Segmented
-                options={[
-                  { value: 'GBP', label: 'GBP (£)' },
-                  { value: 'EUR', label: 'EUR (€)' },
-                  { value: 'USD', label: 'USD ($)' }
-                ]}
+              <Select
+                aria-label="Currency"
                 value={currency}
-                onChange={handleCurrencyChange}
-              />
+                onChange={(e) => handleCurrencyChange(e.target.value)}
+                className="w-full rounded-xl border border-black/10 bg-white py-2 text-sm"
+              >
+                {CURRENCY_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </Select>
             </div>
 
             {/* Amount Input */}
@@ -369,6 +396,7 @@ export default function TokenCalculatorPage() {
               onSelect={() => {
                 setCurrency('GBP');
                 setAmount(10);
+                try { localStorage.setItem('currency', 'GBP'); new BroadcastChannel('app-events').postMessage({ type: 'currency-updated', currency: 'GBP' }); } catch {}
               }}
             />
             <ExampleCard
@@ -377,6 +405,7 @@ export default function TokenCalculatorPage() {
               onSelect={() => {
                 setCurrency('EUR');
                 setAmount(11.50);
+                try { localStorage.setItem('currency', 'EUR'); new BroadcastChannel('app-events').postMessage({ type: 'currency-updated', currency: 'EUR' }); } catch {}
               }}
             />
             <ExampleCard
@@ -385,6 +414,34 @@ export default function TokenCalculatorPage() {
               onSelect={() => {
                 setCurrency('USD');
                 setAmount(13.30);
+                try { localStorage.setItem('currency', 'USD'); new BroadcastChannel('app-events').postMessage({ type: 'currency-updated', currency: 'USD' }); } catch {}
+              }}
+            />
+            <ExampleCard
+              currency="AUD"
+              amount={19.10}
+              onSelect={() => {
+                setCurrency('AUD');
+                setAmount(19.10);
+                try { localStorage.setItem('currency', 'AUD'); new BroadcastChannel('app-events').postMessage({ type: 'currency-updated', currency: 'AUD' }); } catch {}
+              }}
+            />
+            <ExampleCard
+              currency="CAD"
+              amount={18.50}
+              onSelect={() => {
+                setCurrency('CAD');
+                setAmount(18.50);
+                try { localStorage.setItem('currency', 'CAD'); new BroadcastChannel('app-events').postMessage({ type: 'currency-updated', currency: 'CAD' }); } catch {}
+              }}
+            />
+            <ExampleCard
+              currency="NZD"
+              amount={22.70}
+              onSelect={() => {
+                setCurrency('NZD');
+                setAmount(22.70);
+                try { localStorage.setItem('currency', 'NZD'); new BroadcastChannel('app-events').postMessage({ type: 'currency-updated', currency: 'NZD' }); } catch {}
               }}
             />
           </div>
