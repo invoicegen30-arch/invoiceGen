@@ -25,6 +25,9 @@ export async function POST(req: Request) {
     } else if (body.currency === "CAD") {
       chargeCurrency = "GBP";
       chargeAmount = convertToGBP(Number(body.amount), "CAD");
+    } else if (body.currency === "NZD") {
+      chargeCurrency = "GBP";
+      chargeAmount = convertToGBP(Number(body.amount), "NZD");
     }
 
     const payload = {

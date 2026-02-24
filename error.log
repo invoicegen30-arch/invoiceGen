@@ -1,0 +1,108 @@
+13:33:04.942 Running build in Washington, D.C., USA (East) – iad1
+13:33:04.942 Build machine configuration: 2 cores, 8 GB
+13:33:05.089 Cloning github.com/invoicegen30-arch/invoiceGen (Branch: main, Commit: c5164c7)
+13:33:05.722 Cloning completed: 633.000ms
+13:33:08.158 Restored build cache from previous deployment (nZUzMbHXZ6DkvqzBkQ9HwikhkTC4)
+13:33:08.578 Running "vercel build"
+13:33:09.216 Vercel CLI 50.22.0
+13:33:09.519 Installing dependencies...
+13:33:09.928 yarn install v1.22.19
+13:33:10.017 [1/4] Resolving packages...
+13:33:10.318 [2/4] Fetching packages...
+13:33:44.030 warning bare-fs@4.2.3: The engine "bare" appears to be invalid.
+13:33:44.031 warning bare-os@3.6.2: The engine "bare" appears to be invalid.
+13:33:44.060 [3/4] Linking dependencies...
+13:33:52.866 [4/4] Building fresh packages...
+13:33:55.429 success Saved lockfile.
+13:33:55.432 $ prisma generate
+13:33:55.783 Prisma schema loaded from prisma/schema.prisma
+13:33:56.217 
+13:33:56.218 ✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 256ms
+13:33:56.218 
+13:33:56.218 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+13:33:56.219 
+13:33:56.219 Tip: Want to react to database changes in your app as they happen? Discover how with Pulse: https://pris.ly/tip-1-pulse
+13:33:56.219 
+13:33:56.408 Done in 46.48s.
+13:33:56.435 Detected Next.js version: 15.5.2
+13:33:56.439 Running "yarn run build"
+13:33:56.622 yarn run v1.22.19
+13:33:56.649 $ node scripts/prisma-deploy.js && next build
+13:33:56.690 [prisma-deploy] Running prisma migrate deploy...
+13:33:57.778 Prisma schema loaded from prisma/schema.prisma
+13:33:57.783 Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-proud-surf-abscamfj-pooler.eu-west-2.aws.neon.tech"
+13:34:02.827 
+13:34:02.828 Error: P1001: Can't reach database server at `ep-proud-surf-abscamfj-pooler.eu-west-2.aws.neon.tech:5432`
+13:34:02.828 
+13:34:02.828 Please make sure your database server is running at `ep-proud-surf-abscamfj-pooler.eu-west-2.aws.neon.tech:5432`.
+13:34:02.860 [prisma-deploy] Deploy failed. Trying to resolve failed migrations and retry...
+13:34:03.506 Prisma schema loaded from prisma/schema.prisma
+13:34:03.513 Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-proud-surf-abscamfj-pooler.eu-west-2.aws.neon.tech"
+13:34:05.514 Error: P3012
+13:34:05.514 
+13:34:05.514 Migration `0007_company_logo_url` cannot be rolled back because it is not in a failed state.
+13:34:05.514 
+13:34:06.168 Prisma schema loaded from prisma/schema.prisma
+13:34:06.174 Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-proud-surf-abscamfj-pooler.eu-west-2.aws.neon.tech"
+13:34:08.120 Error: P3012
+13:34:08.120 
+13:34:08.120 Migration `0008_add_invoice_due` cannot be rolled back because it is not in a failed state.
+13:34:08.121 
+13:34:08.800 Prisma schema loaded from prisma/schema.prisma
+13:34:08.806 Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-proud-surf-abscamfj-pooler.eu-west-2.aws.neon.tech"
+13:34:10.739 Error: P3012
+13:34:10.740 
+13:34:10.740 Migration `0006_company_bankname` cannot be rolled back because it is not in a failed state.
+13:34:10.740 
+13:34:11.403 Prisma schema loaded from prisma/schema.prisma
+13:34:11.409 Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-proud-surf-abscamfj-pooler.eu-west-2.aws.neon.tech"
+13:34:13.352 Error: P3012
+13:34:13.353 
+13:34:13.353 Migration `0005_amounts_decimal` cannot be rolled back because it is not in a failed state.
+13:34:13.353 
+13:34:14.019 Prisma schema loaded from prisma/schema.prisma
+13:34:14.027 Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-proud-surf-abscamfj-pooler.eu-west-2.aws.neon.tech"
+13:34:15.939 Error: P3012
+13:34:15.939 
+13:34:15.940 Migration `0004_add_client_meta` cannot be rolled back because it is not in a failed state.
+13:34:15.940 
+13:34:16.592 Prisma schema loaded from prisma/schema.prisma
+13:34:16.600 Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-proud-surf-abscamfj-pooler.eu-west-2.aws.neon.tech"
+13:34:17.424 
+13:34:17.425 12 migrations found in prisma/migrations
+13:34:17.425 
+13:34:18.695 
+13:34:18.695 No pending migrations to apply.
+13:34:18.737 ┌─────────────────────────────────────────────────────────┐
+13:34:18.737 │  Update available 5.22.0 -> 7.4.1                       │
+13:34:18.737 │                                                         │
+13:34:18.738 │  This is a major update - please follow the guide at    │
+13:34:18.738 │  https://pris.ly/d/major-version-upgrade                │
+13:34:18.738 │                                                         │
+13:34:18.738 │  Run the following to update                            │
+13:34:18.738 │    yarn add --dev prisma@latest                         │
+13:34:18.739 │    yarn add @prisma/client@latest                       │
+13:34:18.739 └─────────────────────────────────────────────────────────┘
+13:34:18.759 [prisma-deploy] Deploy succeeded after resolve.
+13:34:19.471    ▲ Next.js 15.5.2
+13:34:19.472 
+13:34:19.549    Creating an optimized production build ...
+13:34:41.886  ✓ Compiled successfully in 22.0s
+13:34:41.891    Linting and checking validity of types ...
+13:34:52.648 Failed to compile.
+13:34:52.649 
+13:34:52.649 ./src/app/token-calculator/page.tsx:30:18
+13:34:52.650 Type error: Element implicitly has an 'any' type because expression of type '"GBP" | "EUR" | "USD" | "AUD" | "CAD"' can't be used to index type '{ GBP: string; EUR: string; USD: string; }'.
+13:34:52.651   Property 'AUD' does not exist on type '{ GBP: string; EUR: string; USD: string; }'.
+13:34:52.651 
+13:34:52.651 [0m [90m 28 |[39m     [33mUSD[39m[33m:[39m [32m'$'[39m[33m,[39m
+13:34:52.652  [90m 29 |[39m   }[33m;[39m
+13:34:52.652 [31m[1m>[22m[39m[90m 30 |[39m   [36mconst[39m symbol [33m=[39m symbols[currency] [33m||[39m currency[33m;[39m
+13:34:52.653  [90m    |[39m                  [31m[1m^[22m[39m
+13:34:52.653  [90m 31 |[39m
+13:34:52.653  [90m 32 |[39m   [90m// Use 3 decimal places for amounts < 1, 2 decimal places for larger amounts[39m
+13:34:52.653  [90m 33 |[39m   [36mconst[39m decimals [33m=[39m amount [33m<[39m [35m1[39m [33m?[39m [35m3[39m [33m:[39m [35m2[39m[33m;[39m[0m
+13:34:52.683 Next.js build worker exited with code: 1 and signal: null
+13:34:52.738 error Command failed with exit code 1.
+13:34:52.738 info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
+13:34:52.760 Error: Command "yarn run build" exited with 1

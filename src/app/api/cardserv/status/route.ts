@@ -13,9 +13,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // AUD and CAD are display-only; CardServ charge was in GBP
+    // AUD, CAD, NZD are display-only; CardServ charge was in GBP
     const cardServCurrency =
-      currency === "AUD" || currency === "CAD" ? "GBP" : currency;
+      currency === "AUD" || currency === "CAD" || currency === "NZD" ? "GBP" : currency;
     const statusData = await getCardServStatus(orderMerchantId, orderSystemId, cardServCurrency);
 
     return NextResponse.json(

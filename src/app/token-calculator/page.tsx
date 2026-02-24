@@ -26,6 +26,9 @@ function formatCurrencyPrecise(amount: number, currency: Currency): string {
     GBP: '£',
     EUR: '€',
     USD: '$',
+    AUD: 'A$',
+    CAD: 'C$',
+    NZD: 'NZ$',
   };
   const symbol = symbols[currency] || currency;
 

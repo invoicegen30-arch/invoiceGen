@@ -8,6 +8,7 @@ export const EXCHANGE_RATES = {
   USD: 1.33,   // 1 GBP = 1.33 USD
   AUD: 1.91,   // 1 GBP = 1.91 AUD
   CAD: 1.85,   // 1 GBP = 1.85 CAD
+  NZD: 2.27,   // 1 GBP = 2.27 NZD
 } as const;
 
 export type Currency = keyof typeof EXCHANGE_RATES;
@@ -80,6 +81,7 @@ export function formatCurrency(amount: number, currency: Currency): string {
     USD: '$',
     AUD: 'A$',
     CAD: 'C$',
+    NZD: 'NZ$',
   };
   
   const symbol = symbols[currency] || currency;
