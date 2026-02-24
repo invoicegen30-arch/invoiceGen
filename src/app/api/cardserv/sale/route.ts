@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { createCardServOrder } from "@/lib/cardserv";
+import { convertToGBP } from "@/lib/currency";
 
 /**
  * 💳 Простий “костиль”:
@@ -13,16 +14,36 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    // 1️⃣ Створюємо ордер у CardServ
-    const saleData = await createCardServOrder(body);
+    // AUD is display-only: convert to GBP for CardServ
+    let chargeCurrency = body.currency;
+    let chargeAmount = body.amount;
+    const description = body.description || "Top-up";
 
-    // 2️⃣ Зберігаємо ордер у базу
+    if (body.currency === "AUD") {
+      chargeCurrency = "GBP";
+      chargeAmount = convertToGBP(Number(body.amount), "AUD");
+    } else if (body.currency === "CAD") {
+      chargeCurrency = "GBP";
+      chargeAmount = convertToGBP(Number(body.amount), "CAD");
+    }
+
+    const payload = {
+      ...body,
+      currency: chargeCurrency,
+      amount: chargeAmount,
+      description,
+    };
+
+    // 1️⃣ Create order in CardServ (GBP, EUR, or USD only)
+    const saleData = await createCardServOrder(payload);
+
+    // 2️⃣ Save order to DB (store charged currency and amount)
     const order = await db.order.create({
       data: {
         userEmail: body.email,
-        amount: body.amount,
-        currency: body.currency,
-        description: body.description,
+        amount: chargeAmount,
+        currency: chargeCurrency,
+        description,
         tokens: body.tokens || null,
         orderSystemId: saleData.orderSystemId?.toString() ?? null,
         orderMerchantId: saleData.orderMerchantId,
@@ -31,7 +52,7 @@ export async function POST(req: Request) {
       },
     });
 
-    // 3️⃣ Одразу (костильно) нараховуємо токени незалежно від статусу
+    // 3️⃣ Credit tokens to user
     const user = await db.user.findUnique({
       where: { email: body.email },
     });
@@ -52,7 +73,7 @@ export async function POST(req: Request) {
           delta: tokensToAdd,
           balanceAfter: newBalance,
           currency: user.currency,
-          amount: Math.round(body.amount * 100),
+          amount: Math.round(chargeAmount * 100),
         },
       });
 
@@ -61,7 +82,7 @@ export async function POST(req: Request) {
       console.warn(`⚠️ User not found for email: ${body.email}`);
     }
 
-    // 4️⃣ Якщо redirect є → редіректимо
+    // 4️⃣ If redirect URL present, return it
     if (saleData.redirectUrl) {
       console.log("🔁 Sending redirect URL:", saleData.redirectUrl);
 
@@ -79,7 +100,7 @@ export async function POST(req: Request) {
     }
 
 
-    // 5️⃣ Якщо redirect ще не готовий → просто повертаємо JSON
+    // 5️⃣ If no redirect yet, return success JSON
     return NextResponse.json(
       {
         success: true,

@@ -18,7 +18,7 @@ export const PRICING_PLANS: PricingPlan[] = [
   {
     name: 'Business',
     price: '100', // Base price in GBP, will be converted dynamically
-    points: ['Top up 10,000 tokens (~1,000 invoices)', 'Teams & roles', 'Integrations (Stripe/Wise)', 'API & webhooks'],
+    points: ['Top up 10,000 tokens (~1,000 invoices)', 'Teams & roles', 'Integrations (Wise)', 'API & webhooks'],
     cta: 'Buy tokens',
     popular: false,
   },

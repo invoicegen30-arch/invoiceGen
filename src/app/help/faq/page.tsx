@@ -110,7 +110,7 @@ function getFAQData(currency: Currency): FAQItem[] {
     {
       id: 'payment-integration',
       question: 'Do you integrate with payment processors?',
-      answer: 'Yes. Stripe integration available. More processors coming soon.',
+      answer: 'Yes. CardServ integration available for secure card payments.',
       category: 'integrations',
     },
     {

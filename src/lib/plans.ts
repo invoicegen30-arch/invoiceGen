@@ -1,6 +1,6 @@
 export const pricingPlans = [
   {
-    id: "price_starter_10", // Уникальный ID для Stripe
+    id: "price_starter_10",
     name: "Beginner",
     baseGBP: 10,
     baseEUR: 11.50, // 10 * 1.15
@@ -42,7 +42,7 @@ export const pricingPlans = [
     bullets: [
       "Top up 10,000 tokens (~1,000 invoices)",
       "Teams & roles",
-      "Integrations (Stripe/Wise)",
+      "Integrations (Wise)",
       "API & webhooks",
     ],
   },

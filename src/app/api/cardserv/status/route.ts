@@ -13,7 +13,10 @@ export async function POST(req: Request) {
       );
     }
 
-    const statusData = await getCardServStatus(orderMerchantId, orderSystemId, currency);
+    // AUD and CAD are display-only; CardServ charge was in GBP
+    const cardServCurrency =
+      currency === "AUD" || currency === "CAD" ? "GBP" : currency;
+    const statusData = await getCardServStatus(orderMerchantId, orderSystemId, cardServCurrency);
 
     return NextResponse.json(
       {

@@ -45,7 +45,7 @@ const STEPS = [
       'Choose from £10, £50, £100 or custom amount',
       'Tokens never expire - use them when needed',
       'VAT is calculated at checkout based on your location',
-      'Secure payment via Stripe'
+      'Secure payment via card (CardServ)'
     ],
     cta: 'Buy tokens',
     ctaLink: '/pricing',
