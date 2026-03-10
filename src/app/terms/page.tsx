@@ -151,7 +151,7 @@ function getTermsSections(currency: Currency): PolicySection[] {
       body: `Official communications to the Company should be sent to:
 Email: info@invoicerly.co.uk
 Address: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET
-Phone: +44 7537 103023` 
+Phone: +44 7588 664597` 
     },
     { 
       id: 'governing-law', 
@@ -173,7 +173,7 @@ Phone: +44 7537 103023`
       body: `GET STUFFED LTD (trading as Invoicerly)
 Company number: 15673179
 Registered office: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET
-Email: info@invoicerly.co.uk | Tel: +44 7537 103023` 
+Email: info@invoicerly.co.uk | Tel: +44 7588 664597` 
     },
   ];
 }

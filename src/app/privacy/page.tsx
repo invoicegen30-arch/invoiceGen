@@ -12,7 +12,7 @@ const sections: PolicySection[] = [
     title: '1. Introduction', 
     body: `We value your privacy and are committed to handling personal data responsibly. This Privacy Policy explains what data we collect, why we process it, how long we retain it, who we share it with, and how you can exercise your rights in connection with the services provided at invoicerly.co.uk operated by GET STUFFED LTD (trading as Invoicerly), Company No. 15673179, registered office: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET ("Invoicerly", "we", "us", "our").
 
-For questions or data requests, contact: info@invoicerly.co.uk or +44 7537 103023.
+For questions or data requests, contact: info@invoicerly.co.uk or +44 7588 664597.
 
 Who is the controller?
 • We act as controller for account, billing, support and website usage data.
@@ -147,7 +147,7 @@ To exercise your rights, email info@invoicerly.co.uk. We may need to verify your
     id: 'contact', 
     title: '13. Contact & Complaints', 
     body: `Controller: GET STUFFED LTD (trading as Invoicerly)
-Email: info@invoicerly.co.uk | Tel: +44 7537 103023
+Email: info@invoicerly.co.uk | Tel: +44 7588 664597
 Address: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET` 
   },
   { 
@@ -156,7 +156,7 @@ Address: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2E
     body: `GET STUFFED LTD (trading as Invoicerly)
 Company number: 15673179
 Registered office: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET
-Email: info@invoicerly.co.uk | Tel: +44 7537 103023` 
+Email: info@invoicerly.co.uk | Tel: +44 7588 664597` 
   },
 ];
 

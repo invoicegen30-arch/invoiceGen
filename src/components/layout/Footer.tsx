@@ -32,8 +32,8 @@ export default function Footer() {
                 </a>
               </div>
               <div>
-                <a href="tel:+447537103023" className="hover:underline">
-                  +44 7537 103023
+                <a href="tel:+44 7588 664597" className="hover:underline">
+                  +44 7588 664597
                 </a>
               </div>
             </div>

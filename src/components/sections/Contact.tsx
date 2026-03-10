@@ -43,7 +43,7 @@ export default function Contact() {
             <div>Reg: 15673179</div>
             <div>Address: Flat 21 County Chambers, 1 Drapery, Northampton, United Kingdom, NN1 2ET</div>
             <div>Email: info@invoicerly.co.uk</div>
-            <div>Phone: +44 7537 103023</div>
+            <div>Phone: +44 7588 664597</div>
           </div>
         </motion.div>
 
