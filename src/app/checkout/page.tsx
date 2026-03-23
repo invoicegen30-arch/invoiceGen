@@ -100,6 +100,7 @@ export default function CheckoutPage() {
       ============================== */
 
       let redirectUrl = null;
+      let lastOrderState = sale?.data?.status || "PROCESSING";
       let attempts = 0;
 
       while (!redirectUrl && attempts < 6) {
@@ -122,22 +123,34 @@ export default function CheckoutPage() {
           status?.redirectUrl ||
           status?.raw?.redirectUrl;
 
+        lastOrderState = status?.data?.orderState || lastOrderState;
+
         attempts++;
       }
 
-      if (sale.redirectUrl) {
-        window.location.href = sale.redirectUrl;
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
         return;
       }
 
 
       /* =============================
-         3) NO REDIRECT → SUCCESS UI
+         3) NO REDIRECT → CHECK STATE
       ============================== */
-      toast.success("Order created successfully!");
-      setSuccess(true);
-      confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-      setTimeout(() => router.push("/my-orders"), 4000);
+
+      if (lastOrderState === "APPROVED") {
+        toast.success("Payment approved!");
+        setSuccess(true);
+        confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+        setTimeout(() => router.push("/my-orders"), 4000);
+      } else if (lastOrderState === "DECLINED" || lastOrderState === "ERROR") {
+        toast.error(`Payment ${lastOrderState.toLowerCase()}. Please try again.`);
+      } else {
+        // Still PROCESSING — order created, pending 3DS or bank confirmation
+        toast.success("Order created! Payment is being processed.");
+        setSuccess(true);
+        setTimeout(() => router.push("/my-orders"), 4000);
+      }
 
     } catch (err: any) {
       toast.error(err.message || "Payment failed");
