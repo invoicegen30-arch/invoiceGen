@@ -298,13 +298,14 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
       try {
         await fetch('/api/company', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: sender.company, vat: sender.vat, address1: sender.address, city: sender.city, country: sender.country, iban: sender.iban, logoUrl: logo || undefined, bankName: sender.bankName, bic: sender.bic }) });
       } catch {}
-      
+
       // Create Ready invoice directly (charges 10 tokens)
       const res = await fetch('/api/invoices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           currency,
+          template,
           client: client.name,
           subtotal: Math.round(subtotal),
           tax: Math.round(taxTotal),
@@ -328,24 +329,24 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
           })),
         }),
       });
-      
+
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.error || 'Failed to create invoice');
       }
-      
+
       const { invoice, tokenBalance } = await res.json();
       createdInvoiceId = invoice.id as string;
       if (!invoice || !invoice.id) {
         throw new Error("Could not create invoice for download.");
       }
-      
+
       // Update token balance
       if (typeof tokenBalance === 'number') {
         setTokenBalance(tokenBalance);
         try { bcRef.current?.postMessage({ type: 'tokens-updated', tokenBalance }); } catch {}
       }
-      
+
       // Update invoice meta
       try {
         setInvoiceMeta((prev) => ({ ...prev, number: String(invoice.number || prev.number), date: new Date(invoice.date).toISOString().slice(0, 10) }));
@@ -522,6 +523,7 @@ const sendEmail = async () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           currency,
+          template,
           client: client.name,
           subtotal: Math.round(subtotal),
           tax: Math.round(taxTotal),
@@ -545,28 +547,28 @@ const sendEmail = async () => {
           })),
         }),
       });
-      
+
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.error || 'Failed to create invoice');
       }
-      
+
       const { invoice, tokenBalance } = await res.json();
       if (!invoice || !invoice.id) {
         throw new Error("Could not create invoice for sending.");
       }
-      
+
       // Update token balance
       if (typeof tokenBalance === 'number') {
         setTokenBalance(tokenBalance);
         try { bcRef.current?.postMessage({ type: 'tokens-updated', tokenBalance }); } catch {}
       }
-      
+
       // Update invoice meta
       try {
         setInvoiceMeta((prev) => ({ ...prev, number: String(invoice.number || prev.number), date: new Date(invoice.date).toISOString().slice(0, 10) }));
       } catch {}
-      
+
       const savedInvoice = invoice;
 
       // 2. Проверяем email клиента
@@ -575,7 +577,7 @@ const sendEmail = async () => {
         setBusy(null);
         return;
       }
-      
+
       const recipientEmail = client.email;
 
       // 3. Отправляем на наш API
@@ -747,7 +749,7 @@ const sendEmail = async () => {
 
             <hr className="my-4 border-black/10" />
 
-            
+
 
             <div className="mb-4">
               <h3 className="text-sm font-semibold tracking-wide text-slate-800 uppercase">Sender</h3>

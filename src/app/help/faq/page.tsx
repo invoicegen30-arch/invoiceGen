@@ -9,7 +9,7 @@ import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import { type Currency } from '@/lib/currency';
 
-type FAQCategory = 'tokens' | 'vat' | 'pdf' | 'account' | 'integrations';
+type FAQCategory = 'tokens' | 'pdf' | 'account' | 'integrations';
 type FAQItem = {
   id: string;
   question: string;
@@ -22,7 +22,7 @@ type FAQItem = {
 function getFAQData(currency: Currency): FAQItem[] {
   const currencySymbol = currency === 'GBP' ? '£' : currency === 'EUR' ? '€' : '$';
   const currencyAmount = currency === 'GBP' ? '1,00' : currency === 'EUR' ? '1,15' : '1,33';
-  
+
   return [
     // Top Questions
     {
@@ -30,13 +30,6 @@ function getFAQData(currency: Currency): FAQItem[] {
       question: 'How does pricing work?',
       answer: `Pay-as-you-go. ${currencyAmount} ${currencySymbol} = 100 tokens. Issuing an invoice costs 10 tokens. Tokens never expire.`,
       category: 'tokens',
-      top: true,
-    },
-    {
-      id: 'vat-modes',
-      question: 'What VAT modes are supported?',
-      answer: 'Domestic, intra-EU 0% (reverse charge), UK↔EU cross-border, export.',
-      category: 'vat',
       top: true,
     },
     {
@@ -54,15 +47,9 @@ function getFAQData(currency: Currency): FAQItem[] {
       top: true,
     },
     {
-      id: 'vat-calculations',
-      question: 'How are VAT calculations handled?',
-      answer: 'Automatically based on seller/buyer countries and VAT numbers. Supports reverse charge, domestic rates, and exports.',
-      category: 'vat',
-    },
-    {
       id: 'token-packages',
       question: 'What token packages are available?',
-      answer: 'Starter (£10/1000 tokens), Pro (£50/5000 tokens), Business (£100/10000 tokens), and Custom amounts.',
+      answer: `Starter (${currencySymbol}10/1000 tokens), Pro (${currencySymbol}50/5000 tokens), Business (${currencySymbol}100/10000 tokens), and Custom amounts.`,
       category: 'tokens',
     },
     {
@@ -80,14 +67,8 @@ function getFAQData(currency: Currency): FAQItem[] {
     {
       id: 'account-setup',
       question: 'How do I set up my account?',
-      answer: 'Sign up with email, verify, add company details, and start creating invoices immediately.',
+      answer: 'Sign up with email and password, add company details, and start creating invoices immediately.',
       category: 'account',
-    },
-    {
-      id: 'vat-numbers',
-      question: 'Do I need a VAT number?',
-      answer: 'Only if you are VAT-registered. The system handles both VAT and non-VAT businesses.',
-      category: 'vat',
     },
     {
       id: 'invoice-numbering',
@@ -104,7 +85,7 @@ function getFAQData(currency: Currency): FAQItem[] {
     {
       id: 'multi-currency',
       question: 'What currencies are supported?',
-      answer: 'GBP, EUR. More currencies coming soon.',
+      answer: 'GBP, EUR, USD. More currencies coming soon.',
       category: 'tokens',
     },
     {
@@ -173,39 +154,32 @@ function getFAQData(currency: Currency): FAQItem[] {
       answer: 'Yes. Send automated reminders for overdue invoices.',
       category: 'pdf',
     },
-    {
-      id: 'delete-account',
-      question: 'How to delete my account?',
-      answer: 'Settings → Delete. We retain records where law requires (e.g., tax).',
-      category: 'account',
-    },
   ];
 }
 
 const CATEGORIES = [
   { id: 'tokens', label: 'Tokens & billing', color: 'bg-blue-100 text-blue-800' },
-  { id: 'vat', label: 'VAT & tax', color: 'bg-green-100 text-green-800' },
   { id: 'pdf', label: 'PDF & email', color: 'bg-purple-100 text-purple-800' },
   { id: 'account', label: 'Account & settings', color: 'bg-orange-100 text-orange-800' },
   { id: 'integrations', label: 'Integrations', color: 'bg-pink-100 text-pink-800' },
 ];
 
-function FAQCard({ 
-  item, 
-  isExpanded, 
-  onToggle, 
-  highlightQuery, 
-  onHelpful, 
-  onNotHelpful, 
-  onContact, 
-  isHelpful, 
-  showContactForm, 
-  contactEmail, 
-  contactMessage, 
-  onEmailChange, 
-  onMessageChange, 
-  onSubmitContact, 
-  onCancelContact 
+function FAQCard({
+  item,
+  isExpanded,
+  onToggle,
+  highlightQuery,
+  onHelpful,
+  onNotHelpful,
+  onContact,
+  isHelpful,
+  showContactForm,
+  contactEmail,
+  contactMessage,
+  onEmailChange,
+  onMessageChange,
+  onSubmitContact,
+  onCancelContact
 }: {
   item: FAQItem;
   isExpanded: boolean;
@@ -225,11 +199,11 @@ function FAQCard({
 }) {
   const highlightText = (text: string, query: string) => {
     if (!query.trim()) return text;
-    
+
     const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
     const parts = text.split(regex);
-    
-    return parts.map((part, index) => 
+
+    return parts.map((part, index) =>
       regex.test(part) ? (
         <mark key={index} className="bg-yellow-200 px-1 rounded">
           {part}
@@ -290,7 +264,7 @@ function FAQCard({
             </svg>
           </div>
         </div>
-        
+
         <AnimatePresence>
           {isExpanded && (
             <motion.div
@@ -304,7 +278,7 @@ function FAQCard({
                 <div className="prose prose-sm max-w-none text-slate-600">
                   {highlightText(item.answer, highlightQuery)}
                 </div>
-                
+
                 <div className="mt-6 pt-4 border-t border-slate-100">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -315,8 +289,8 @@ function FAQCard({
                           onHelpful();
                         }}
                         className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                          isHelpful === true 
-                            ? 'bg-green-100 text-green-700' 
+                          isHelpful === true
+                            ? 'bg-green-100 text-green-700'
                             : 'bg-slate-100 text-slate-600 hover:bg-green-50'
                         }`}
                       >
@@ -328,15 +302,15 @@ function FAQCard({
                           onNotHelpful();
                         }}
                         className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                          isHelpful === false 
-                            ? 'bg-red-100 text-red-700' 
+                          isHelpful === false
+                            ? 'bg-red-100 text-red-700'
                             : 'bg-slate-100 text-slate-600 hover:bg-red-50'
                         }`}
                       >
                         👎 No
                       </button>
                     </div>
-                    
+
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -347,7 +321,7 @@ function FAQCard({
                       Contact us
                     </button>
                   </div>
-                  
+
                   <AnimatePresence>
                     {showContactForm && (
                       <motion.div
@@ -438,7 +412,7 @@ function FAQContent() {
   // Listen for currency changes from header using BroadcastChannel
   useEffect(() => {
     const bc = new BroadcastChannel('app-events');
-    
+
     const handleMessage = (event: MessageEvent) => {
       if (event.data.type === 'currency-updated' && (event.data.currency === 'GBP' || event.data.currency === 'EUR' || event.data.currency === 'USD')) {
         setCurrency(event.data.currency);
@@ -446,7 +420,7 @@ function FAQContent() {
     };
 
     bc.addEventListener('message', handleMessage);
-    
+
     return () => {
       bc.removeEventListener('message', handleMessage);
       bc.close();
@@ -473,13 +447,13 @@ function FAQContent() {
   // Filter and search FAQ items
   const filteredItems = useMemo(() => {
     const faqData = getFAQData(currency);
-    
+
     return faqData.filter(item => {
       const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
-      const matchesSearch = !searchQuery.trim() || 
+      const matchesSearch = !searchQuery.trim() ||
         item.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.answer.toLowerCase().includes(searchQuery.toLowerCase());
-      
+
       return matchesCategory && matchesSearch;
     });
   }, [selectedCategory, searchQuery, currency]);
@@ -662,7 +636,7 @@ function FAQContent() {
             />
           ))}
         </div>
-        
+
         {filteredItems.length === 0 && (
           <div className="text-center py-12">
             <div className="text-slate-400 mb-4">

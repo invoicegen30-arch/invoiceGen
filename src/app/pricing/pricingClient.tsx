@@ -4,14 +4,13 @@ import {motion} from 'framer-motion';
 import {Loader2} from 'lucide-react';
 import {useSession} from 'next-auth/react';
 import {useRouter} from 'next/navigation';
-import {useEffect, useMemo, useRef, useState} from 'react';
-import {toast} from 'sonner';
+import {useEffect, useRef, useState} from 'react';
 
 import Section from '@/components/layout/Section';
 import Pill from '@/components/policy/Pill';
 import Button from '@/components/ui/Button';
 import Select from '@/components/ui/Select';
-import {CC, VAT_RATES} from '@/lib/constants';
+import {CC} from '@/lib/constants';
 import {pricingPlans} from '@/lib/plans';
 import {calculateTokens, formatCurrency, convertFromGBP, type Currency, CURRENCY_OPTIONS} from '@/lib/currency';
 
@@ -40,7 +39,7 @@ function Badge({children}: { children: React.ReactNode }) {
     className="text-xs rounded-full px-2 py-1 text-blue-700 bg-blue-50 border border-blue-200">{children}</span>;
 }
 
-function Price({amount, currency, vatRate}: { amount: number; currency: Currency; vatRate: number }) {
+function Price({amount, currency}: { amount: number; currency: Currency }) {
   const [display, setDisplay] = useState(0);
   useEffect(() => {
     let raf: number;
@@ -54,15 +53,11 @@ function Price({amount, currency, vatRate}: { amount: number; currency: Currency
     raf = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(raf);
   }, [amount]);
-  const incVatTotal = amount * (1 + vatRate / 100);
   return (
     <div>
       <div className="text-3xl font-bold">
         {money(display, currency)}
         <span className="text-base font-normal text-slate-500">/one-time</span>
-      </div>
-      <div className="text-[11px] text-slate-500 mt-1">
-        Est. incl. VAT: {money(incVatTotal, currency)}
       </div>
     </div>
   );
@@ -83,12 +78,6 @@ export default function PricingClient() {
   const {status, data} = useSession();
   const router = useRouter();
   const signedIn = status === 'authenticated';
-
-  const vatRate = useMemo(() => {
-    const code = (CC as Record<string, string>)[country] || 'UK';
-    const rates = (VAT_RATES as Record<string, number[]>)[code] || [0, 20];
-    return rates[rates.length - 1] || 20;
-  }, [country]);
 
   useEffect(() => {
     try {
@@ -150,11 +139,11 @@ export default function PricingClient() {
           <div className="inline-flex items-center gap-2">
             <Pill>UK-first</Pill>
             <Pill>EU-ready</Pill>
-            <Pill>Prices exclude VAT</Pill>
+            <Pill>Pay-as-you-go</Pill>
           </div>
           <h1 className="mt-4 text-3xl sm:text-4xl font-bold">Top-Up</h1>
           <p className="mt-2 text-slate-600">
-            Choose a top-up, set your country & currency — we estimate VAT for transparency.
+            Choose a top-up, set your country & currency — start creating invoices instantly.
           </p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
@@ -210,7 +199,7 @@ export default function PricingClient() {
                   {plan.popular && <Badge>POPULAR</Badge>}
                 </div>
                 <div className="mt-3">
-                  <Price amount={base} currency={currency} vatRate={vatRate}/>
+                  <Price amount={base} currency={currency}/>
                 </div>
                 <div className="mt-1 text-xs text-slate-600">
                   = {plan.tokens} tokens (~{invoices} invoices)
@@ -245,11 +234,10 @@ export default function PricingClient() {
             <h3 className="text-lg font-semibold">FAQ</h3>
             <div className="mt-4 space-y-4 text-sm text-slate-700">
               <div>
-                <div className="font-medium">Do prices include VAT?</div>
+                <div className="font-medium">How does pricing work?</div>
                 <p className="text-slate-600 mt-1">
-                  No. Prices exclude VAT. We calculate tax at checkout using your country and VAT
-                  ID. For eligible EU B2B customers with a valid VAT ID, reverse charge (0%) is
-                  applied.
+                  Pay-as-you-go. Purchase tokens and use them to issue invoices.
+                  Tokens never expire. No subscriptions or hidden fees.
                 </p>
               </div>
               <div>
@@ -268,7 +256,7 @@ export default function PricingClient() {
               <div>
                 <div className="font-medium">Do you issue invoices?</div>
                 <p className="text-slate-600 mt-1">
-                  Yes. Invoices include your company details and VAT breakdown.
+                  Yes. Payment receipts are sent to your email automatically.
                 </p>
               </div>
             </div>
@@ -277,7 +265,7 @@ export default function PricingClient() {
             <h3 className="text-lg font-semibold">Still not sure?</h3>
             <div className="mt-4 grid sm:grid-cols-2 gap-3 text-sm">
               <div className="rounded-xl border border-dashed border-black/15 p-4">
-                <div className="font-medium">UK & EU VAT-ready</div>
+                <div className="font-medium">Multi-currency ready</div>
                 <p className="text-slate-600 mt-1">Correct tax, currencies, and number formats.</p>
               </div>
               <div className="rounded-xl border border-dashed border-black/15 p-4">

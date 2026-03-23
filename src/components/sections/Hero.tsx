@@ -23,7 +23,7 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <span>UK & EU VAT-ready</span>
+              <span>Multi-currency ready</span>
               <span>·</span>
               <span>UK GDPR</span>
               <span>·</span>
@@ -45,7 +45,7 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.6 }}
             >
-              VAT-aware templates, multi-currency, live preview, and one-click sending.
+              Professional templates, multi-currency, live preview, and one-click sending.
             </motion.p>
 
             <motion.div
@@ -75,7 +75,7 @@ export default function Hero() {
                 <span>50+ currencies</span>
               </div>
               <div className="flex items-center gap-2">
-                <span>UK & EU VAT</span>
+                <span>Tax-compliant</span>
               </div>
             </motion.div>
           </motion.div>

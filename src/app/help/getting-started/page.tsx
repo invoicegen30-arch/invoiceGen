@@ -27,7 +27,7 @@ const STEPS = [
     description: 'Configure your business information for professional invoices.',
     details: [
       'Company name and registration number',
-      'VAT number (if applicable)',
+      'Tax registration number (if applicable)',
       'Business address and contact details',
       'Bank details (IBAN/BIC) for payments',
       'Invoice numbering prefix'
@@ -42,9 +42,9 @@ const STEPS = [
     title: 'Top up tokens',
     description: 'Purchase tokens to create and send invoices.',
     details: [
-      'Choose from £10, £50, £100 or custom amount',
+      'Choose from Starter (1,000 tokens), Pro (5,000), Business (10,000) or custom',
       'Tokens never expire - use them when needed',
-      'VAT is calculated at checkout based on your location',
+      'Price depends on your selected currency (GBP, EUR, USD)',
       'Secure payment via card (CardServ)'
     ],
     cta: 'Buy tokens',
@@ -59,7 +59,7 @@ const STEPS = [
     details: [
       'Add client information (company, address, email)',
       'Enter line items with descriptions and amounts',
-      'Choose appropriate VAT mode for your region',
+      'Choose appropriate tax mode for your region',
       'Preview your invoice before issuing'
     ],
     cta: 'Open invoice generator',
@@ -124,7 +124,7 @@ export default function GettingStartedPage() {
             <div className="sticky top-8">
               <div className="bg-white rounded-xl p-6 border border-slate-200">
                 <h2 className="text-lg font-semibold text-slate-900 mb-4">Getting Started</h2>
-                
+
                 {/* Progress Bar */}
                 <div className="mb-6">
                   <div className="flex justify-between text-sm text-slate-600 mb-2">
@@ -179,7 +179,7 @@ export default function GettingStartedPage() {
               <p className="text-lg text-slate-600 mb-8">
                 Follow these simple steps to create and send your first professional invoice
               </p>
-              
+
               {/* Mini Checklist */}
               <div className="bg-white rounded-xl p-6 border border-slate-200 max-w-2xl mx-auto">
                 <h3 className="font-semibold text-slate-900 mb-4">Quick checklist</h3>
@@ -187,8 +187,8 @@ export default function GettingStartedPage() {
                   {STEPS.map((step, index) => (
                     <div key={step.id} className="flex items-center gap-2">
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
-                        completedSteps.has(index) 
-                          ? 'bg-emerald-500 text-white' 
+                        completedSteps.has(index)
+                          ? 'bg-emerald-500 text-white'
                           : 'bg-slate-200 text-slate-600'
                       }`}>
                         {completedSteps.has(index) ? '✓' : index + 1}
@@ -262,7 +262,7 @@ export default function GettingStartedPage() {
                     >
                       {STEPS[activeStep].cta}
                     </Button>
-                    
+
                     {activeStep < STEPS.length - 1 && (
                       <Button
                         variant="outline"
@@ -289,7 +289,7 @@ export default function GettingStartedPage() {
               >
                 ← Previous
               </Button>
-              
+
               <div className="flex gap-2">
                 {STEPS.map((_, index) => (
                   <button
@@ -303,7 +303,7 @@ export default function GettingStartedPage() {
                   />
                 ))}
               </div>
-              
+
               <Button
                 onClick={() => setActiveStep(Math.min(STEPS.length - 1, activeStep + 1))}
                 disabled={activeStep === STEPS.length - 1}
@@ -321,7 +321,7 @@ export default function GettingStartedPage() {
                       🎉 Congratulations! You're all set
                     </h3>
                     <p className="text-slate-600 mb-6">
-                      You now know how to create and send professional invoices. 
+                      You now know how to create and send professional invoices.
                       Need help with billing or have questions? Check out our resources below.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">

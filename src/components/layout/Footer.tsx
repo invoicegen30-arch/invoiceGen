@@ -68,7 +68,7 @@ export default function Footer() {
             <div className="grid gap-1 text-slate-700">
               <Link href="/privacy" className="hover:underline">Privacy</Link>
               <Link href="/terms" className="hover:underline">Terms</Link>
-              <Link href="/cookies" className="hover:underline">Cookie</Link>
+              <Link href="/cookies" className="hover:underline">Cookie Policy</Link>
               <Link href="/refund" className="hover:underline">Refund</Link>
             </div>
           </div>
@@ -95,17 +95,17 @@ export default function Footer() {
         <div className="mt-8 flex items-center justify-between text-xs text-slate-600">
           <div>(c) {new Date().getFullYear()} Invoicerly - All rights reserved</div>
           <div className="flex items-center gap-3">
-            <Image 
-              src="/visa-logo.svg" 
-              alt="Visa" 
-              width={60} 
+            <Image
+              src="/visa-logo.svg"
+              alt="Visa"
+              width={60}
               height={20}
               className="object-contain"
             />
-            <Image 
-              src="/mastercard-logo.svg" 
-              alt="MasterCard" 
-              width={60} 
+            <Image
+              src="/mastercard-logo.svg"
+              alt="MasterCard"
+              width={60}
               height={20}
               className="object-contain"
             />

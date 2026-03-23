@@ -28,7 +28,7 @@ const TESTIMONIALS = [
     role: 'IT Services Lead',
     location: 'Paris, FR',
     quote:
-      'Saved clients & items as presets = zero repeats. Totals and VAT breakdown are always spot on.',
+      'Saved clients & items as presets = zero repeats. Totals and tax breakdown are always spot on.',
     img: '/nicolas.webp',
   },
   {
@@ -52,7 +52,7 @@ const TESTIMONIALS = [
     role: 'Consultant',
     location: 'Milan, IT',
     quote:
-      'Love the VAT modes: domestic, intra-EU 0%, export. The system explains what applies and why.',
+      'Love the tax modes: domestic, cross-border, export. The system explains what applies and why.',
     img: '/elena.webp',
   },
 ] as const;

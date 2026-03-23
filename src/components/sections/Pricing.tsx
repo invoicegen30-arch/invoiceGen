@@ -18,7 +18,7 @@ function AnimatedPrice({ amountInGBP, currency }: { amountInGBP: number; currenc
   const convertedAmount = useMemo(() => convertFromGBP(amountInGBP, currency), [amountInGBP, currency]);
   const [display, setDisplay] = useState(convertedAmount);
   const displayRef = useRef(convertedAmount);
-  
+
   // Count-up animation (400ms)
   useEffect(() => {
     let raf: number;
@@ -26,7 +26,7 @@ function AnimatedPrice({ amountInGBP, currency }: { amountInGBP: number; currenc
     const duration = 400;
     const startValue = displayRef.current;
     const endValue = convertedAmount;
-    
+
     const animate = (t: number) => {
       const p = Math.min(1, (t - start) / duration);
       const currentValue = startValue + (endValue - startValue) * p;
@@ -37,7 +37,7 @@ function AnimatedPrice({ amountInGBP, currency }: { amountInGBP: number; currenc
     raf = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(raf);
   }, [convertedAmount]);
-  
+
   return (
     <div className="text-3xl font-bold">
       {money(display, currency)}
@@ -149,7 +149,7 @@ export default function Pricing() {
           <CustomHomeCard currency={currency} />
         </motion.div>
       </div>
-      <p className="mt-4 text-xs text-slate-500 text-center">Prices exclude VAT. Tokens deposit to your account after purchase (signed-in users only).</p>
+      <p className="mt-4 text-xs text-slate-500 text-center">Tokens deposit to your account after purchase (signed-in users only).</p>
     </Section>
   );
 }

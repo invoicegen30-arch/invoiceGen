@@ -12,6 +12,7 @@ enum Currency {
   GBP
   EUR
   USD
+  AUD
 }
 
 enum InvoiceStatus {
@@ -109,6 +110,7 @@ model Order {
   orderSystemId   String?  @unique
   orderMerchantId String?
   status          String   @default("PROCESSING")
+  tokensCredited  Boolean  @default(false)
   response        Json?
   createdAt       DateTime @default(now())
 }
@@ -128,6 +130,7 @@ model Invoice {
   subtotal  Decimal  @db.Decimal(12, 2)
   tax       Decimal  @db.Decimal(12, 2)
   total     Decimal  @db.Decimal(12, 2)
+  template  String   @default("Freelance")
   status    InvoiceStatus @default(Draft)
   createdAt DateTime @default(now())
 

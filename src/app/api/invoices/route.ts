@@ -85,6 +85,8 @@ export async function POST(req: Request) {
       ? body.clientMeta
       : undefined;
 
+  const templateName = typeof body.template === 'string' ? body.template : 'Freelance';
+
   return await prisma.$transaction(async (tx) => {
     const user = await tx.user.findUnique({
       where: { id: userId },
@@ -124,6 +126,7 @@ export async function POST(req: Request) {
         tax,
         total,
         status: 'Ready',
+        template: templateName,
         clientMeta: clientMeta as any,
         items: items.length
           ? {

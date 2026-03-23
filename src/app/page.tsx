@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import Hero from '@/components/sections/Hero';
 import WhyUs from '@/components/sections/WhyUs';
 import TemplatesGallery from '@/components/sections/TemplatesGallery';
-import TrustedBy from '@/components/sections/TrustedBy';
 import Pricing from '@/components/sections/Pricing';
 import Testimonials from '@/components/sections/Testimonials';
 import Contact from '@/components/sections/Contact';
@@ -22,7 +21,6 @@ export default function HomePage() {
         <Hero />
         <WhyUs />
         <TemplatesGallery />
-        <TrustedBy />
         <PricingClient />
         <Testimonials />
         <Contact />

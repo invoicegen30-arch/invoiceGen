@@ -28,7 +28,7 @@ export const TESTIMONIALS: Testimonial[] = [
   {
     name: 'Marta K.',
     role: 'Freelance Designer',
-    text: 'Finally painless invoices. Two clicks and the client gets a VAT-correct bill.',
+    text: 'Finally painless invoices. Two clicks and the client gets a tax-correct bill.',
   },
   {
     name: 'Anders L.',
@@ -57,7 +57,7 @@ export const FEATURES: Feature[] = [
   },
   {
     id: 'multiCurrency',
-    title: 'Multi-currency / VAT',
+    title: 'Multi-currency & tax',
     description: 'Correct totals, tax breakdowns, number formats.',
     metric: '0 errors in totals (test suite)',
   },

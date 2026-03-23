@@ -55,35 +55,8 @@ export async function POST(req: Request) {
       },
     });
 
-    // 3️⃣ Credit tokens to user
-    const user = await db.user.findUnique({
-      where: { email: body.email },
-    });
-
-    if (user) {
-      const tokensToAdd = body.tokens ?? 0;
-      const newBalance = user.tokenBalance + tokensToAdd;
-
-      await db.user.update({
-        where: { id: user.id },
-        data: { tokenBalance: newBalance },
-      });
-
-      await db.ledgerEntry.create({
-        data: {
-          userId: user.id,
-          type: "Top-up",
-          delta: tokensToAdd,
-          balanceAfter: newBalance,
-          currency: user.currency,
-          amount: Math.round(chargeAmount * 100),
-        },
-      });
-
-      console.log(`✅ [INSTANT] Tokens credited: +${tokensToAdd} → ${user.email}`);
-    } else {
-      console.warn(`⚠️ User not found for email: ${body.email}`);
-    }
+    // 3️⃣ Tokens will be credited by webhook / check-orders after APPROVED
+    console.log(`⏳ Order saved for ${body.email}, tokens will be credited after approval`);
 
     // 4️⃣ If redirect URL present, return it
     if (saleData.redirectUrl) {
@@ -107,7 +80,7 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         success: true,
-        message: "Tokens credited instantly and order saved.",
+        message: "Order created. Tokens will be credited after approval.",
         data: {
           orderId: order.id,
           orderMerchantId: saleData.orderMerchantId,
