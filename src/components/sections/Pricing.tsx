@@ -10,7 +10,8 @@ import { THEME } from '@/lib/theme';
 import { calculateTokens, formatCurrency, convertFromGBP, convertToGBP, type Currency } from '@/lib/currency';
 
 function money(n: number, currency: Currency) {
-  const locale = currency === 'GBP' ? 'en-GB' : currency === 'EUR' ? 'en-IE' : 'en-US';
+  const locales: Record<Currency, string> = { GBP: 'en-GB', EUR: 'en-IE', USD: 'en-US', AUD: 'en-AU', CAD: 'en-CA', NZD: 'en-NZ' };
+  const locale = locales[currency] || 'en-US';
   return new Intl.NumberFormat(locale, { style: 'currency', currency, maximumFractionDigits: n % 1 === 0 ? 0 : 2 }).format(n);
 }
 
@@ -58,7 +59,7 @@ export default function Pricing() {
       bcRef.current = new BroadcastChannel('app-events');
       bcRef.current.onmessage = (ev: MessageEvent) => {
         const data: any = (ev as any)?.data || {};
-        if (data.type === 'currency-updated' && (data.currency === 'GBP' || data.currency === 'EUR' || data.currency === 'USD')) {
+        if (data.type === 'currency-updated' && ['GBP', 'EUR', 'USD', 'AUD', 'CAD', 'NZD'].includes(data.currency)) {
           setCurrency(data.currency);
           try { localStorage.setItem('currency', data.currency); } catch {}
         }

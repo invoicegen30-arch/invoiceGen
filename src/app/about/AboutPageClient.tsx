@@ -65,7 +65,7 @@ export default function AboutPageClient() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
           >
-            Simple, fast, and compliant invoice generation with token-based pricing. 
+            Simple, fast, and compliant invoice generation with token-based pricing.
             No subscriptions, no hidden fees, no data selling.
           </motion.p>
 
@@ -407,21 +407,27 @@ export default function AboutPageClient() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                   <span className="text-sm text-slate-600">Logo (SVG)</span>
-                  <Button variant="outline" size="sm" onClick={handlePressDownload}>
-                    Download
-                  </Button>
+                  <a href="/favicon.svg" download="invoicerly-logo.svg" onClick={handlePressDownload}>
+                    <Button variant="outline" size="sm">
+                      Download
+                    </Button>
+                  </a>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                  <span className="text-sm text-slate-600">Logo (PNG)</span>
-                  <Button variant="outline" size="sm" onClick={handlePressDownload}>
-                    Download
-                  </Button>
+                  <span className="text-sm text-slate-600">Favicon (SVG)</span>
+                  <a href="/favicon.svg" download="invoicerly-favicon.svg" onClick={handlePressDownload}>
+                    <Button variant="outline" size="sm">
+                      Download
+                    </Button>
+                  </a>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                  <span className="text-sm text-slate-600">Favicon</span>
-                  <Button variant="outline" size="sm" onClick={handlePressDownload}>
-                    Download
-                  </Button>
+                  <span className="text-sm text-slate-600">Favicon (ICO)</span>
+                  <a href="/favicon.ico" download="invoicerly-favicon.ico" onClick={handlePressDownload}>
+                    <Button variant="outline" size="sm">
+                      Download
+                    </Button>
+                  </a>
                 </div>
               </div>
             </Card>

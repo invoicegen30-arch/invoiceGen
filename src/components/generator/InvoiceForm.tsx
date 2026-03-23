@@ -127,6 +127,12 @@ export default function InvoiceForm({ signedIn }: InvoiceFormProps) {
       return next;
     });
 
+  const removeItem = (idx: number) => {
+    if (items.length <= 1) return; // keep at least one item
+    setItems((prev) => prev.filter((_, i) => i !== idx));
+    setRateInputs((prev) => prev.filter((_, i) => i !== idx));
+  };
+
   const updateItem = (idx: number, key: keyof Item, val: any) =>
     setItems((prev) => prev.map((it, i) => (i === idx ? { ...it, [key]: val } : it)));
 
@@ -801,16 +807,17 @@ const sendEmail = async () => {
               <p className="text-xs text-slate-500 mt-1">Use Enter to add a new row</p>
             </div>
             <div className="grid gap-2">
-              <div className="grid grid-cols-12 gap-2 text-[11px] text-slate-600">
-                <div className="col-span-6">Description</div>
-                <div className="col-span-2 text-right">Qty</div>
-                <div className="col-span-2 text-right">Rate ({currency})</div>
-                <div className="col-span-2 text-right">Tax %</div>
+              <div className="grid grid-cols-[1fr_60px_80px_60px_32px] gap-2 text-[11px] text-slate-600">
+                <div>Description</div>
+                <div className="text-right">Qty</div>
+                <div className="text-right">Rate ({currency})</div>
+                <div className="text-right">Tax %</div>
+                <div></div>
               </div>
               {items.map((it, i) => (
-                <motion.div key={i} className="grid grid-cols-12 gap-2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-                  <Input value={it.desc} onChange={(e) => updateItem(i, 'desc', e.target.value)} wrapperClassName="col-span-6 min-w-0" />
-                  <Input value={it.qty} onChange={(e) => updateItem(i, 'qty', Number(e.target.value))} wrapperClassName="col-span-2 min-w-0" className="text-right" inputMode="numeric" />
+                <motion.div key={i} className="grid grid-cols-[1fr_60px_80px_60px_32px] gap-2 items-center" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
+                  <Input value={it.desc} onChange={(e) => updateItem(i, 'desc', e.target.value)} wrapperClassName="min-w-0" />
+                  <Input value={it.qty} onChange={(e) => updateItem(i, 'qty', Number(e.target.value))} wrapperClassName="min-w-0" className="text-right" inputMode="numeric" />
                   <Input
                     value={rateInputs[i] ?? ''}
                     inputMode="decimal"
@@ -830,10 +837,21 @@ const sendEmail = async () => {
                       const num = parseFloat(s);
                       updateItem(i, 'rate', Number.isNaN(num) ? 0 : num);
                     }}
-                    wrapperClassName="col-span-2 min-w-0"
+                    wrapperClassName="min-w-0"
                     className="text-right"
                   />
-                  <Input value={it.tax} onChange={(e) => updateItem(i, 'tax', Number(e.target.value))} wrapperClassName="col-span-2 min-w-0" className="text-right" inputMode="numeric" />
+                  <Input value={it.tax} onChange={(e) => updateItem(i, 'tax', Number(e.target.value))} wrapperClassName="min-w-0" className="text-right" inputMode="numeric" />
+                  <button
+                    onClick={() => removeItem(i)}
+                    disabled={items.length <= 1}
+                    className="flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    title="Remove item"
+                    type="button"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
                 </motion.div>
               ))}
               <button onClick={addItem} className="rounded-lg border border-dashed border-black/15 py-2 text-sm hover:bg-slate-50 transition-colors">

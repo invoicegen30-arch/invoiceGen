@@ -346,11 +346,6 @@ export default function TokenCalculatorPage() {
               </div>
             </div>
 
-            <div className="mb-6 p-4 bg-slate-50 rounded-lg">
-              <p className="text-sm text-slate-600">
-                <strong>Note:</strong> Prices exclude VAT. VAT is calculated at checkout based on your location and VAT status.
-              </p>
-            </div>
 
             {/* CTAs */}
             <div className="space-y-3">

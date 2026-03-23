@@ -105,7 +105,15 @@ export default function PricingClient() {
     setIsLoading(planId);
     try {
       const plan = pricingPlans.find((p) => p.id === planId);
-      const amount = customAmount || (currency === 'GBP' ? plan?.baseGBP : currency === 'EUR' ? plan?.baseEUR : currency === 'USD' ? plan?.baseUSD : plan ? convertFromGBP(plan.baseGBP, currency) : 0) || 0;
+      const amount = customAmount || (plan ? (
+        currency === 'GBP' ? plan.baseGBP :
+        currency === 'EUR' ? plan.baseEUR :
+        currency === 'USD' ? plan.baseUSD :
+        currency === 'AUD' ? plan.baseAUD :
+        currency === 'CAD' ? plan.baseCAD :
+        currency === 'NZD' ? plan.baseNZD :
+        convertFromGBP(plan.baseGBP, currency)
+      ) : 0) || 0;
       const tokens =
         plan?.tokens ||
         Math.max(0, calculateTokens(amount, currency));
@@ -144,7 +152,13 @@ export default function PricingClient() {
 
         <div className="mt-10 grid md:grid-cols-3 lg:grid-cols-4 gap-6">
           {pricingPlans.map((plan) => {
-            const base = currency === 'GBP' ? plan.baseGBP : currency === 'EUR' ? plan.baseEUR : currency === 'USD' ? plan.baseUSD : convertFromGBP(plan.baseGBP, currency);
+            const base = currency === 'GBP' ? plan.baseGBP :
+              currency === 'EUR' ? plan.baseEUR :
+              currency === 'USD' ? plan.baseUSD :
+              currency === 'AUD' ? plan.baseAUD :
+              currency === 'CAD' ? plan.baseCAD :
+              currency === 'NZD' ? plan.baseNZD :
+              convertFromGBP(plan.baseGBP, currency);
             const invoices = Math.round(plan.tokens / 10);
             const loading = isLoading === plan.id;
 

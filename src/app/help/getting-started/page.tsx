@@ -44,7 +44,7 @@ const STEPS = [
     details: [
       'Choose from Starter (1,000 tokens), Pro (5,000), Business (10,000) or custom',
       'Tokens never expire - use them when needed',
-      'Price depends on your selected currency (GBP, EUR, USD)',
+      'Price depends on your selected currency (GBP, EUR, USD, AUD, CAD, NZD)',
       'Secure payment via card (CardServ)'
     ],
     cta: 'Buy tokens',

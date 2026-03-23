@@ -24,10 +24,8 @@ export default function CheckoutPage() {
 
   if (!checkout) return null;
 
-  const vatRate = 0.2;
   const subtotal = checkout.amount;
-  const vatAmount = subtotal * vatRate;
-  const total = subtotal + vatAmount;
+  const total = subtotal;
 
   const validationSchema = Yup.object({
     cardNumber: Yup.string()
@@ -225,12 +223,6 @@ export default function CheckoutPage() {
                     <span className="text-slate-500">Subtotal</span>
                     <span className="font-medium text-slate-700">
                       {subtotal.toFixed(2)} {checkout.currency}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">VAT (20%)</span>
-                    <span className="font-medium text-slate-700">
-                      {vatAmount.toFixed(2)} {checkout.currency}
                     </span>
                   </div>
                   <div className="flex justify-between text-lg font-semibold border-t border-slate-200 pt-3">

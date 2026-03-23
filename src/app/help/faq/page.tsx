@@ -20,8 +20,10 @@ type FAQItem = {
 
 // Function to generate dynamic FAQ data based on currency
 function getFAQData(currency: Currency): FAQItem[] {
-  const currencySymbol = currency === 'GBP' ? '£' : currency === 'EUR' ? '€' : '$';
-  const currencyAmount = currency === 'GBP' ? '1,00' : currency === 'EUR' ? '1,15' : '1,33';
+  const currencySymbols: Record<Currency, string> = { GBP: '£', EUR: '€', USD: '$', AUD: 'A$', CAD: 'C$', NZD: 'NZ$' };
+  const currencyAmounts: Record<Currency, string> = { GBP: '1.00', EUR: '1.15', USD: '1.33', AUD: '1.91', CAD: '1.85', NZD: '2.27' };
+  const currencySymbol = currencySymbols[currency] || '$';
+  const currencyAmount = currencyAmounts[currency] || '1.00';
 
   return [
     // Top Questions
@@ -49,7 +51,7 @@ function getFAQData(currency: Currency): FAQItem[] {
     {
       id: 'token-packages',
       question: 'What token packages are available?',
-      answer: `Starter (${currencySymbol}10/1000 tokens), Pro (${currencySymbol}50/5000 tokens), Business (${currencySymbol}100/10000 tokens), and Custom amounts.`,
+      answer: `Starter (${currencySymbol}${({ GBP: '10', EUR: '11.50', USD: '13.30', AUD: '19.10', CAD: '18.50', NZD: '22.70' } as Record<string,string>)[currency]}/1000 tokens), Pro (${currencySymbol}${({ GBP: '50', EUR: '57.50', USD: '66.50', AUD: '95.50', CAD: '92.50', NZD: '113.50' } as Record<string,string>)[currency]}/5000 tokens), Business (${currencySymbol}${({ GBP: '100', EUR: '115', USD: '133', AUD: '191', CAD: '185', NZD: '227' } as Record<string,string>)[currency]}/10000 tokens), and Custom amounts.`,
       category: 'tokens',
     },
     {
@@ -85,7 +87,7 @@ function getFAQData(currency: Currency): FAQItem[] {
     {
       id: 'multi-currency',
       question: 'What currencies are supported?',
-      answer: 'GBP, EUR, USD. More currencies coming soon.',
+      answer: 'GBP, EUR, USD, AUD, CAD, and NZD.',
       category: 'tokens',
     },
     {
@@ -403,7 +405,7 @@ function FAQContent() {
     setMounted(true);
     try {
       const saved = localStorage.getItem('currency') as Currency;
-      if (saved && (saved === 'GBP' || saved === 'EUR' || saved === 'USD')) {
+      if (saved && ['GBP', 'EUR', 'USD', 'AUD', 'CAD', 'NZD'].includes(saved)) {
         setCurrency(saved);
       }
     } catch {}
@@ -414,7 +416,7 @@ function FAQContent() {
     const bc = new BroadcastChannel('app-events');
 
     const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === 'currency-updated' && (event.data.currency === 'GBP' || event.data.currency === 'EUR' || event.data.currency === 'USD')) {
+      if (event.data.type === 'currency-updated' && ['GBP', 'EUR', 'USD', 'AUD', 'CAD', 'NZD'].includes(event.data.currency)) {
         setCurrency(event.data.currency);
       }
     };

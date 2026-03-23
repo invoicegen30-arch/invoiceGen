@@ -15,6 +15,15 @@ const TOKEN_PACKAGES = [
   { amount: 13.30, currency: 'USD', tokens: 1000, invoices: 100, costPerInvoice: 0.133 },
   { amount: 66.50, currency: 'USD', tokens: 5000, invoices: 500, costPerInvoice: 0.133 },
   { amount: 133, currency: 'USD', tokens: 10000, invoices: 1000, costPerInvoice: 0.133 },
+  { amount: 19.10, currency: 'AUD', tokens: 1000, invoices: 100, costPerInvoice: 0.191 },
+  { amount: 95.50, currency: 'AUD', tokens: 5000, invoices: 500, costPerInvoice: 0.191 },
+  { amount: 191, currency: 'AUD', tokens: 10000, invoices: 1000, costPerInvoice: 0.191 },
+  { amount: 18.50, currency: 'CAD', tokens: 1000, invoices: 100, costPerInvoice: 0.185 },
+  { amount: 92.50, currency: 'CAD', tokens: 5000, invoices: 500, costPerInvoice: 0.185 },
+  { amount: 185, currency: 'CAD', tokens: 10000, invoices: 1000, costPerInvoice: 0.185 },
+  { amount: 22.70, currency: 'NZD', tokens: 1000, invoices: 100, costPerInvoice: 0.227 },
+  { amount: 113.50, currency: 'NZD', tokens: 5000, invoices: 500, costPerInvoice: 0.227 },
+  { amount: 227, currency: 'NZD', tokens: 10000, invoices: 1000, costPerInvoice: 0.227 },
 ];
 
 const LEDGER_SAMPLE = [
@@ -27,7 +36,7 @@ const LEDGER_SAMPLE = [
 ];
 
 export default function BillingTokensPage() {
-  const [selectedCurrency, setSelectedCurrency] = useState<'GBP' | 'EUR' | 'USD'>('GBP');
+  const [selectedCurrency, setSelectedCurrency] = useState<'GBP' | 'EUR' | 'USD' | 'AUD' | 'CAD' | 'NZD'>('GBP');
   const [customAmount, setCustomAmount] = useState<number>(10);
 
   useEffect(() => {
@@ -95,7 +104,7 @@ export default function BillingTokensPage() {
                 </div>
                 <div className="mt-6 p-4 bg-slate-50 rounded-lg">
                   <p className="text-sm text-slate-700">
-                    <strong>Tokens never expire</strong> - use them whenever you need to create invoices. 
+                    <strong>Tokens never expire</strong> - use them whenever you need to create invoices.
                     Drafting and previewing invoices is completely free.
                   </p>
                 </div>
@@ -121,12 +130,15 @@ export default function BillingTokensPage() {
                       />
                       <select
                         value={selectedCurrency}
-                        onChange={(e) => setSelectedCurrency(e.target.value as 'GBP' | 'EUR' | 'USD')}
+                        onChange={(e) => setSelectedCurrency(e.target.value as 'GBP' | 'EUR' | 'USD' | 'AUD' | 'CAD' | 'NZD')}
                         className="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                       >
                         <option value="GBP">GBP</option>
                         <option value="EUR">EUR</option>
                         <option value="USD">USD</option>
+                        <option value="AUD">AUD</option>
+                        <option value="CAD">CAD</option>
+                        <option value="NZD">NZD</option>
                       </select>
                     </div>
                   </div>
@@ -172,7 +184,7 @@ export default function BillingTokensPage() {
                   <div className="flex items-start gap-3">
                     <div className="text-blue-600 font-semibold text-sm">💡 Custom amounts</div>
                     <p className="text-blue-800 text-sm">
-                      You can top up any amount from {selectedCurrency}5 to {selectedCurrency}10,000.
+                      You can top up any amount from {selectedCurrency} 10.00 to {selectedCurrency} 10,000.
                     </p>
                   </div>
                 </div>
@@ -181,27 +193,14 @@ export default function BillingTokensPage() {
 
             <Card>
               <div className="p-8">
-                <h2 className="text-2xl font-bold text-slate-900 mb-6">VAT & Receipts</h2>
+                <h2 className="text-2xl font-bold text-slate-900 mb-6">Receipts & Records</h2>
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-semibold text-slate-900 mb-2">VAT calculation</h3>
-                    <p className="text-slate-700 text-sm mb-3">
-                      VAT is calculated at checkout based on your business location and VAT registration status.
-                    </p>
-                    <ul className="text-sm text-slate-600 space-y-1 ml-4">
-                      <li>• UK businesses: 20% VAT</li>
-                      <li>• EU businesses: Local VAT rate</li>
-                      <li>• EU B2B with valid VAT ID: Reverse charge applies (0% VAT)</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-slate-900 mb-2">Receipts & Records</h3>
                     <p className="text-slate-700 text-sm mb-3">
                       All transactions are recorded in your token ledger. You can access:
                     </p>
                     <ul className="text-sm text-slate-600 space-y-1 ml-4">
                       <li>• Transaction history and receipts in your Dashboard</li>
-                      <li>• Transaction history in your Dashboard</li>
                       <li>• Detailed ledger with invoice numbers</li>
                     </ul>
                   </div>
@@ -230,8 +229,8 @@ export default function BillingTokensPage() {
                           <td className="px-3 py-2 text-slate-600">{entry.date}</td>
                           <td className="px-3 py-2">
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              entry.type === 'Top-up' 
-                                ? 'bg-emerald-100 text-emerald-800' 
+                              entry.type === 'Top-up'
+                                ? 'bg-emerald-100 text-emerald-800'
                                 : 'bg-blue-100 text-blue-800'
                             }`}>
                               {entry.type}
@@ -265,7 +264,7 @@ export default function BillingTokensPage() {
               <div className="p-8">
                 <h2 className="text-2xl font-bold text-slate-900 mb-4">Refunds</h2>
                 <p className="text-slate-700 mb-4">
-                  Unused tokens can be refunded within 14 days of purchase. Used tokens (for issued invoices) 
+                  Unused tokens can be refunded within 14 days of purchase. Used tokens (for issued invoices)
                   are non-refundable. All refunds are processed to the original payment method within 5-10 business days.
                 </p>
                 <Button href="/refund" variant="outline" size="sm">
@@ -290,9 +289,9 @@ export default function BillingTokensPage() {
                   <div>
                     <h3 className="font-semibold text-slate-900 mb-3">Limits</h3>
                     <ul className="text-sm text-slate-600 space-y-2">
-                      <li>• Minimum: {selectedCurrency}5 per transaction</li>
-                      <li>• Maximum: {selectedCurrency}10,000 per transaction</li>
-                      <li>• Daily limit: {selectedCurrency}25,000</li>
+                      <li>• Minimum: {selectedCurrency} 10.00 per transaction</li>
+                      <li>• Maximum: {selectedCurrency} 10,000 per transaction</li>
+                      <li>• Daily limit: {selectedCurrency} 25,000</li>
                       <li>• Fraud protection: Automatic monitoring</li>
                     </ul>
                   </div>
@@ -301,7 +300,7 @@ export default function BillingTokensPage() {
                   <div className="flex items-start gap-3">
                     <div className="text-amber-600 font-semibold text-sm">⚠️ Payment Issues</div>
                     <p className="text-amber-800 text-sm">
-                      If your payment is declined, check your card details and billing address. 
+                      If your payment is declined, check your card details and billing address.
                       For large amounts, contact support for bank transfer options.
                     </p>
                   </div>
@@ -316,16 +315,16 @@ export default function BillingTokensPage() {
                 <div className="p-6">
                   <h3 className="font-semibold text-slate-900 mb-4">Quick Actions</h3>
                   <div className="space-y-3">
-                    <Button 
+                    <Button
                       href={`/pricing?amount=${customAmount}&currency=${selectedCurrency}`}
                       className="w-full"
                       onClick={() => handleTopUpClick()}
                     >
                       Top up tokens
                     </Button>
-                    <Button 
-                      href="/token-calculator" 
-                      variant="outline" 
+                    <Button
+                      href="/token-calculator"
+                      variant="outline"
                       className="w-full"
                     >
                       Open Token Calculator
