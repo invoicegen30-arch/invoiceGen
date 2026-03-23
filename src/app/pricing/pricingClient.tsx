@@ -9,12 +9,8 @@ import {useEffect, useRef, useState} from 'react';
 import Section from '@/components/layout/Section';
 import Pill from '@/components/policy/Pill';
 import Button from '@/components/ui/Button';
-import Select from '@/components/ui/Select';
-import {CC} from '@/lib/constants';
 import {pricingPlans} from '@/lib/plans';
 import {calculateTokens, formatCurrency, convertFromGBP, type Currency, CURRENCY_OPTIONS} from '@/lib/currency';
-
-const COUNTRIES = Object.keys(CC);
 
 const CURRENCY_SYMBOLS: Record<Currency, string> = {
   GBP: '£', EUR: '€', USD: '$', AUD: 'A$', CAD: 'C$', NZD: 'NZ$',
@@ -73,7 +69,6 @@ export default function PricingClient() {
       return 'GBP';
     }
   });
-  const [country, setCountry] = useState<string>('United Kingdom');
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const {status, data} = useSession();
   const router = useRouter();
@@ -143,34 +138,8 @@ export default function PricingClient() {
           </div>
           <h1 className="mt-4 text-3xl sm:text-4xl font-bold">Top-Up</h1>
           <p className="mt-2 text-slate-600">
-            Choose a top-up, set your country & currency — start creating invoices instantly.
+            Choose a top-up — start creating invoices instantly.
           </p>
-
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <Select
-              aria-label="Currency"
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value as Currency)}
-              className="min-w-[8rem] rounded-xl border border-black/10 bg-white px-3 py-2 text-sm"
-            >
-              {CURRENCY_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </Select>
-            <select
-              className="rounded-xl border border-black/10 bg-white px-3 py-2 text-sm"
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-            >
-              {COUNTRIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
 
         <div className="mt-10 grid md:grid-cols-3 lg:grid-cols-4 gap-6">

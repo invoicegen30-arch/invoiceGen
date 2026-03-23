@@ -109,6 +109,13 @@ export default function Footer() {
               height={20}
               className="object-contain"
             />
+            <Image
+              src="/pci-dss-logo.svg"
+              alt="PCI DSS Compliant"
+              width={48}
+              height={20}
+              className="object-contain"
+            />
           </div>
         </div>
       </section>
