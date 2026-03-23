@@ -33,6 +33,16 @@ model User {
   image         String?
   password      String?
 
+  // Profile fields
+  firstName   String?
+  lastName    String?
+  phone       String?
+  street      String?
+  city        String?
+  country     String?
+  postalCode  String?
+  dateOfBirth DateTime?
+
   // App-specific fields
   tokenBalance Int       @default(0)
   currency     Currency  @default(GBP)
